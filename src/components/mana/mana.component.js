@@ -15,7 +15,7 @@ const ManaUnit = ({unit, qty}) => {
         className={'unit-item'}
         onClick={e => dispatch(stateUpdaters.setManaUnit.make(unit.id))}
     >
-        <p>{unit.name} <span>{quantity.valueOf()}</span></p>
+        <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
     </div>)
 }
 

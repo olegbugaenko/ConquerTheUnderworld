@@ -6,7 +6,7 @@ export const manaUnits = [{
     cost: {
         energy: new BigNumber(1),
         gold: new BigNumber(5000),
-        mana: new BigNumber(100)
+        mana: new BigNumber(40)
     },
     production: {
         mana: new BigNumber(1)
@@ -33,7 +33,7 @@ export const manaUnits = [{
     cost: {
         energy: new BigNumber(100),
         gold: new BigNumber('9.e9'),
-        mana: new BigNumber(4000),
+        mana: new BigNumber(4000000),
         unit: {
             mage1: new BigNumber(2000)
         }
@@ -49,7 +49,7 @@ export const manaUnits = [{
     cost: {
         energy: new BigNumber(2000),
         gold: new BigNumber('7e13'),
-        mana: new BigNumber('3e7'),
+        mana: new BigNumber('9e9'),
         unit: {
             mage2: new BigNumber(40000)
         }
@@ -65,7 +65,7 @@ export const manaUnits = [{
     cost: {
         energy: new BigNumber(20000),
         gold: new BigNumber('9e17'),
-        mana: new BigNumber('3e7'),
+        mana: new BigNumber('1.2e13'),
         unit: {
             mage2: new BigNumber(40000)
         }
@@ -104,6 +104,26 @@ export const manaUnitsUpgrades = [{
     cost: (level) => ({
         unit: {
             mage2: new BigNumber(64).pow(level.add(1)).roundTo(0),
+        }
+    }),
+    effect: (level) => new BigNumber(2).pow(level),
+},{
+    id: 'mage3Effiency',
+    targetId: 'mage3',
+    name: 'Effiency',
+    cost: (level) => ({
+        unit: {
+            mage3: new BigNumber(81).pow(level.add(1)).roundTo(0),
+        }
+    }),
+    effect: (level) => new BigNumber(2).pow(level),
+},{
+    id: 'mage4Effiency',
+    targetId: 'mage4',
+    name: 'Effiency',
+    cost: (level) => ({
+        unit: {
+            mage4: new BigNumber(101).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),

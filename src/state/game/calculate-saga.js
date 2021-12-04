@@ -63,6 +63,7 @@ class CalculateSaga{
                     let units = gold?.units[costUnitId]
                         || mana?.units[costUnitId]
                         || territory?.units[costUnitId];
+
                     if(!units) {
                         maxAmount = new BigNumber(0);
                     } else {

@@ -59,7 +59,30 @@ export const goldUnits = [{
             sumonner1: new BigNumber(3)
         }
     }
-}]
+},
+    ...(()=>{
+        const result = [];
+        for(let i = 3; i < 50; i++) {
+            result.push({
+                id: `sumonner${i}`,
+                name: `Skeleton summoner ${i}`,
+                cost: {
+                    energy: new BigNumber(i),
+                    gold: new BigNumber(10).pow(i*i),
+                    mana: new BigNumber(2).mul(i-1),
+                    unit: {
+                        [`sumonner${i-1}`]: new BigNumber(10).pow(i*i).mul(i+1)
+                    }
+                },
+                production: {
+                    unit: {
+                        [`sumonner${i-1}`]: new BigNumber(i+1)
+                    }
+                }
+            })
+        }
+        return result;
+    })()]
 
 export const goldUnitsUpgrades = [{
     id: 'skeletonEffiency',
@@ -91,4 +114,22 @@ export const goldUnitsUpgrades = [{
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
-}]
+},
+    ...(()=>{
+        const result = [];
+        for(let i = 2; i < 50; i++) {
+            result.push({
+                id: `sumonner${i}Effiency`,
+                targetId: `sumonner${i}`,
+                name: 'Effiency',
+                cost: (level) => ({
+                    unit: {
+                        [`sumonner${i}`]: new BigNumber(35 + 5*i).pow(level.add(1)).roundTo(0),
+                    }
+                }),
+                effect: (level) => new BigNumber(2).pow(level),
+            })
+        }
+        return result;
+    })()
+]

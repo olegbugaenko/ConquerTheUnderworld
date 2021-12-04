@@ -7,8 +7,8 @@ export const stateUpdaters = {
         id,
         amount,
     })),
-    updateManyUnits: createAction('UPDATE_MANY_UNITS', array => array),
-    updateUnitUpgrade: createAction('UPDATE_UNIT_UPGRADE', ({id, amount}) => ({
+    updateManyUnits: createAction('UPDATE_MANY_MANA_UNITS', array => array),
+    updateUnitUpgrade: createAction('UPDATE_MANA_UNIT_UPGRADE', ({id, amount}) => ({
         id,
         amount,
     }))
