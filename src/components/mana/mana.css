@@ -1,0 +1,32 @@
+.mana-screen {
+    display: flex;
+}
+
+.mana-screen .units {
+    width: 200px;
+    background: #212145;
+    height: 100vh;
+    overflow-y: scroll;
+}
+
+.mana-screen .units .unit-item{
+    padding: 10px;
+    border-bottom: 1px solid #262649;
+    color: #fff;
+    cursor: pointer;
+}
+
+.mana-screen .units .unit-item p {
+    margin: 0;
+}
+
+.mana-screen .units .unit-item:hover{
+    padding: 10px;
+    border-bottom: 1px solid #262649;
+    color: #fff;
+    font-weight: bold;
+}
+
+.purchaseArea {
+    padding-top: 20px;
+}

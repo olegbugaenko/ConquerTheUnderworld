@@ -1,0 +1,13 @@
+.menu-item {
+    padding: 5px;
+    border-bottom: 1px solid #555;
+}
+
+.menu-item p {
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item.active {
+    background-color: #362950;
+}

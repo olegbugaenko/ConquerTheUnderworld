@@ -1,0 +1,32 @@
+.gold-screen {
+    display: flex;
+}
+
+.gold-screen .units {
+    width: 200px;
+    background: #404015;
+    height: 100vh;
+    overflow-y: scroll;
+}
+
+.gold-screen .units .unit-item{
+    padding: 10px;
+    border-bottom: 1px solid #454521;
+    color: #fff;
+    cursor: pointer;
+}
+
+.gold-screen .units .unit-item p {
+    margin: 0;
+}
+
+.gold-screen .units .unit-item:hover{
+    padding: 10px;
+    border-bottom: 1px solid #454521;
+    color: #fff;
+    font-weight: bold;
+}
+
+.purchaseArea {
+    padding-top: 20px;
+}
