@@ -8,12 +8,13 @@ import { BigNumber } from "@waves/bignumber"
 
 
 const initialState = {
-    gold: new BigNumber(10),
+    stats: {
+        hp: new BigNumber(0),
+        at: new BigNumber(0),
+        df: new BigNumber(0)
+    },
     units: {
-        skeleton: new BigNumber(0),
-        sumonner0: new BigNumber(0),
-        sumonner1: new BigNumber(0),
-        sumonner2: new BigNumber(0),
+
     },
     upgrades: {
 
@@ -22,16 +23,13 @@ const initialState = {
 
 export default makeReducer(
     initialState,
-    on(stateUpdaters.useGold, (state, { payload }) => { return {
+    on(stateUpdaters.setStats, (state, { payload }) => { return {
         ...state,
-        gold: state.gold.sub(payload)
-    }}),
-    on(stateUpdaters.addGold, (state, { payload }) => {
-        return {
-            ...state,
-            gold: state.gold.add(payload)
+        stats: {
+            ...state.stats,
+            ...payload
         }
-    }),
+    }}),
     on(stateUpdaters.updateUnit, (state, { payload: { id, amount } }) => {
         return {
             ...state,

@@ -1,44 +1,44 @@
 import {useDispatch, useSelector} from "react-redux";
 import { BigNumber} from "@waves/bignumber";
-import {goldUnits, goldUnitsUpgrades} from "../../database/gold";
-import './gold.css'
+import {armyUnits, armyUnitsUpgrades} from "../../database/army";
+import './army.css'
 import {stateUpdaters} from "../../state/ui/actions";
-import {interactionActions} from "../../state/game/gold/actions";
+import {interactionActions} from "../../state/game/army/actions";
 import CostComponent from "../general/cost.component";
 import formatBig from "../general/fmt-val";
 import {Scrollbars} from "react-custom-scrollbars";
 import classNames from "classnames";
 
-const GoldUnit = ({unit, qty}) => {
+const ArmyUnit = ({unit, qty}) => {
     const dispatch = useDispatch();
     const quantity = qty || new BigNumber(0);
     return (<div
         className={'unit-item'}
-        onClick={e => dispatch(stateUpdaters.setGoldUnit.make(unit.id))}
+        onClick={e => dispatch(stateUpdaters.setArmyUnit.make(unit.id))}
     >
         <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
     </div>)
 }
 
-function Gold() {
+function Army() {
     const dispatch = useDispatch();
-    const { gold } = useSelector(state => state.game);
-    const { goldUnitCalculations, goldUnit, availableUpgrades } = useSelector(state => state.ui);
-    const currentUnit = goldUnits.find(one => one.id === goldUnit);
-    const upgradesAvailable = goldUnitsUpgrades.filter(
+    const { army } = useSelector(state => state.game);
+    const { armyCalculations, armyUnit, availableUpgrades } = useSelector(state => state.ui);
+    const currentUnit = armyUnits.find(one => one.id === armyUnit);
+    const upgradesAvailable = armyUnitsUpgrades.filter(
         one => Array.isArray(one.targetId)
-            ? one.targetId.includes(goldUnit)
-            : one.targetId === goldUnit
+            ? one.targetId.includes(armyUnit)
+            : one.targetId === armyUnit
     ).map(one => ({
         ...one,
-        level: gold.upgrades[one.id] || new BigNumber(0),
+        level: army.upgrades[one.id] || new BigNumber(0),
         cost: availableUpgrades?.find(u => u.id === one.id) || {}
     }))
 
-    return(<div className={classNames('units-screen','gold-screen')}>
+    return(<div className={classNames('army-screen','units-screen')}>
         <div className={'units'}>
             <Scrollbars style={{ width: 220, height: '100vh' }}>
-            {goldUnits.map(one => <GoldUnit unit={one} qty={gold.units ? gold.units[one.id] : null}/>)}
+            {armyUnits.map(one => <ArmyUnit unit={one} qty={army.units ? army.units[one.id] : null}/>)}
             </Scrollbars>
         </div>
         <div className={'unit-details'}>
@@ -47,26 +47,29 @@ function Gold() {
                 <div className={'columns'}>
                     <div className={'main-column'}>
                         <div className={'main-desc-area'}>
-                            <p>You have {formatBig(gold.units[goldUnit])} units.</p>
-                            {goldUnitCalculations && (<>
+                            <p>You have {formatBig(army.units[armyUnit])} units.</p>
+                            {armyCalculations && (<>
                                 <p>In total they produce:</p>
-                                <CostComponent cost={goldUnitCalculations.ECP}></CostComponent>
+                                <CostComponent cost={armyCalculations.ECP}></CostComponent>
                             </>)}
                         </div>
-                        {upgradesAvailable.map(u => (<div className={'upgrade'}>
-                            <p className={'upgrade-title'}>{u.name} ({formatBig(u.level.roundTo(0))})</p>
-                            <CostComponent cost={u.cost.costs}></CostComponent>
-                            {u.cost.isAvailable && (<button onClick={e=>dispatch(interactionActions.purchaseUpgrade.make({
-                                id: u.id,
-                                amount: 1,
-                            }))}>Purchase</button>)}
-                        </div> ))}
+                        <div className={'upgrade-area'}>
+                            {upgradesAvailable.map(u => (<div className={'upgrade'}>
+                                <p className={'upgrade-title'}>{u.name} ({formatBig(u.level.roundTo(0))})</p>
+                                <CostComponent cost={u.cost.costs}></CostComponent>
+                                {u.cost.isAvailable && (<button onClick={e=>dispatch(interactionActions.purchaseUpgrade.make({
+                                    id: u.id,
+                                    amount: 1,
+                                }))}>Purchase</button>)}
+                            </div> ))}
+                        </div>
+
                     </div>
                     <div className={'purchase-column'}>
-                        {goldUnitCalculations && (<>
+                        {armyCalculations && (<>
                             <div className={'costArea'}>
                                 <p>Each {currentUnit.name} costs:</p>
-                                <CostComponent cost={goldUnitCalculations.perUnit.cost} />
+                                <CostComponent cost={armyCalculations.perUnit.cost} />
                             </div>
                             <div className={'purchaseArea'}>
                                 <div><button
@@ -78,23 +81,23 @@ function Gold() {
                                 <div><button
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
-                                        amount: goldUnitCalculations.per10Percent.qty
+                                        amount: armyCalculations.per10Percent.qty
                                     }))}
-                                >Buy {formatBig(goldUnitCalculations.per10Percent.qty)}</button></div>
+                                >Buy {formatBig(armyCalculations.per10Percent.qty)}</button></div>
                                 <div><button
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
-                                        amount: goldUnitCalculations.perMax.qty
+                                        amount: armyCalculations.perMax.qty
                                     }))}
-                                >Buy {formatBig(goldUnitCalculations.perMax.qty)}</button></div>
-                            </div><div className={'upgrade-area'}>
+                                >Buy {formatBig(armyCalculations.perMax.qty)}</button></div>
 
-                        </div></>)}
+                            </div></>)}
                     </div>
                 </div>
+
             </div>)}
         </div>
     </div>)
 }
 
-export default Gold;
+export default Army;

@@ -17,6 +17,7 @@ import { BigNumber } from "@waves/bignumber"
 import { goldUnits, goldUnitsUpgrades} from "../../../database/gold";
 import CalculateSaga from "../calculate-saga";
 import {stateUpdaters as HeroStateActions} from "../hero/actions";
+import {armyUnits} from "../../../database/army";
 
 class GoldSaga {
 
@@ -45,11 +46,13 @@ class GoldSaga {
 
     static *updateGold(DELAY) {
         const currentData = yield select(state => state.game.gold);
+        const { goldUnit, page } = yield select(state => state.ui);
+        const ECP = {};
+        const units = [];
         for(let i = goldUnits.length - 1; i>-1; i--) {
             const unitAmount = currentData.units[goldUnits[i].id];
             if(!unitAmount) continue;
             // relying on thats already BigNumber
-            const units = [];
 
             //effect bonuses. TODO: make universal
             let bonus = yield CalculateSaga.getEffiencyBonus(
@@ -68,25 +71,38 @@ class GoldSaga {
                         .mul(goldUnits[i].production.unit[key])
                         .mul(DELAY / 1000)
                 });
+                if(page === 'gold' && goldUnit === goldUnits[i].id) {
+                    ECP.unit = {
+                        ...(ECP.unit || {}),
+                        [key]: unitAmount
+                            .mul(bonus)
+                            .mul(goldUnits[i].production.unit[key])
+                    }
+                }
                 // some further transforms, bonuses and so on should be in here
                 /*yield put(GoldStateActions.updateUnit.make({
                     id: key,
                     amount: units[key],
                 }))*/
             }
-            yield put(GoldStateActions.updateManyUnits.make(units));
             if(goldUnits[i].production.gold) {
                 const gold = unitAmount
                     .mul(bonus)
                     .mul(goldUnits[i].production.gold)
                     .mul(DELAY / 1000);
                 yield put(GoldStateActions.addGold.make(gold));
+                if(page === 'gold' && goldUnit === goldUnits[i].id) {
+                    ECP.gold = unitAmount
+                        .mul(bonus)
+                        .mul(goldUnits[i].production.gold);
+                }
             }
         }
-        const { goldUnit, page } = yield select(state => state.ui);
+        yield put(GoldStateActions.updateManyUnits.make(units));
+
         const calculations = yield call(GoldSaga.updatePurchaseConstrains, goldUnit);
         // console.log('calculations', calculations, UiStateActions.setGoldUnitCalculated.make(calculations));
-        yield put(UiStateActions.setGoldUnitCalculated.make(calculations));
+        yield put(UiStateActions.setGoldUnitCalculated.make({...calculations, ECP}));
 
         // get goldUpdates available
         if(page === 'gold') {
@@ -97,7 +113,6 @@ class GoldSaga {
 
     static *purchaseUnit({payload}) {
         const calculations = yield call(GoldSaga.updatePurchaseConstrains, payload.id, payload.amount);
-        console.log(payload, calculations);
         if(calculations.perMax.qty.gte(payload.amount)) {
             const {cost, qty} = calculations.perFinal;
             yield call(CalculateSaga.subtractResources, cost);

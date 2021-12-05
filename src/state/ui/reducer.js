@@ -5,7 +5,8 @@ import { on, makeReducer } from "../state-manager";
 const initialState = {
     page: 'gold',
     goldUnit: 'skeleton',
-    manaUnit: 'myth'
+    manaUnit: 'myth',
+    armyUnit: 'warrior0'
 }
 
 export default makeReducer(
@@ -22,6 +23,10 @@ export default makeReducer(
         ...state,
         manaUnit: payload,
     }}),
+    on(stateUpdaters.setArmyUnit, (state, { payload }) => { return {
+        ...state,
+        armyUnit: payload,
+    }}),
     on(stateUpdaters.setGoldUnitCalculated, (state, { payload }) => { return {
         ...state,
         goldUnitCalculations: payload,
@@ -33,6 +38,10 @@ export default makeReducer(
     on(stateUpdaters.setTrainingCalculated, (state, { payload }) => { return {
         ...state,
         trainingCalculations: payload,
+    }}),
+    on(stateUpdaters.setArmyUnitCalculated, (state, { payload }) => { return {
+        ...state,
+        armyCalculations: payload,
     }}),
     on(stateUpdaters.setUnitUpgradesAvailable, (state, { payload }) => { return {
         ...state,

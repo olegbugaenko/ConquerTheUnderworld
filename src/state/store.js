@@ -12,8 +12,8 @@ import uiReducer from './ui/reducer';
 import GoldSaga from "./game/gold/sagas";
 import ManaSaga from "./game/mana/sagas";
 import HeroSaga from "./game/hero/sagas";
+import ArmySaga from "./game/army/sagas";
 
-console.log('gameReducer', gameReducer);
 
 const mainReducer = combineReducers({
     game: gameReducer,
@@ -33,7 +33,9 @@ export const store = createStore(
 
 [
     GameSagas.runProcess,
+    GameSagas.listener,
     GoldSaga.listener,
     ManaSaga.listener,
     HeroSaga.listener,
+    ArmySaga.listener,
 ].map(saga => sagaMiddleware.run(saga));

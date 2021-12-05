@@ -4,6 +4,7 @@ import Gold from "./gold/gold.component";
 import Mana from "./mana/mana.component";
 import {useSelector} from "react-redux";
 import Energy from "./energy/energy.component";
+import Army from './army/army.component';
 
 const renderContent = page => {
     switch (page) {
@@ -13,6 +14,8 @@ const renderContent = page => {
             return <Mana></Mana>
         case 'energy':
             return <Energy></Energy>
+        case 'army':
+            return <Army></Army>
         default:
             return 'Content'
     }

@@ -1,3 +1,8 @@
+* {
+    font-family: "Century Gothic";
+    font-size: 14px;
+}
+
 .wrap {
     box-sizing: border-box;
     display: flex;
@@ -11,4 +16,53 @@
     flex-basis: 200px;
     background-color: #282c34;
     color: #fff;
+}
+
+.content {
+    background: #333;
+    flex: 1;
+}
+
+/** general content styles **/
+
+.units-screen {
+    display: flex;
+}
+
+.units-screen .units {
+    height: 100vh;
+}
+
+.units-screen .units .unit-item{
+    padding: 10px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.units-screen .units .unit-item p {
+    margin: 0;
+}
+
+.units-screen .units .unit-item:hover{
+    font-weight: bold;
+}
+
+.unit-details {
+    padding: 10px;
+    background: #282c34;
+    color: #fff;
+    flex: 1;
+}
+
+.unit-details .columns {
+    display: flex;
+    justify-content: space-around;
+}
+
+.unit-details .columns > div {
+    padding: 10px;
+}
+
+.purchaseArea {
+    padding-top: 20px;
 }

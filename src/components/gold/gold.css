@@ -1,32 +1,17 @@
-.gold-screen {
-    display: flex;
-}
-
 .gold-screen .units {
-    width: 200px;
-    background: #404015;
-    height: 100vh;
-    overflow-y: scroll;
+    background: #504020;
 }
 
 .gold-screen .units .unit-item{
-    padding: 10px;
-    border-bottom: 1px solid #454521;
-    color: #fff;
-    cursor: pointer;
+    border-bottom: 1px solid #605030;
 }
 
-.gold-screen .units .unit-item p {
-    margin: 0;
-}
 
 .gold-screen .units .unit-item:hover{
-    padding: 10px;
-    border-bottom: 1px solid #454521;
-    color: #fff;
-    font-weight: bold;
+    background: #605030;
 }
 
-.purchaseArea {
-    padding-top: 20px;
+.gold-screen .unit-details {
+    background: #282c34;
+    color: #fff;
 }

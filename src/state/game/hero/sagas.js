@@ -47,7 +47,6 @@ class HeroSaga {
                 [payload.id]: currentData.training[payload.id],
             }
         );
-        console.log('purchased', calculations);
         if(calculations.length && calculations[0].isAvailable) {
             yield call(CalculateSaga.subtractResources, calculations[0].costs);
             yield put(HeroStateActions.updateSkillLevel.make({

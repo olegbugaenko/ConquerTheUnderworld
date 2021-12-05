@@ -1,10 +1,15 @@
+import { saveAs } from 'file-saver';
 import {
     call,
-    delay
+    delay, put,
+    select, takeLatest
 } from 'redux-saga/effects';
 import HeroSaga from "./hero/sagas";
 import GoldSaga from "./gold/sagas";
 import ManaSaga from "./mana/sagas";
+import ArmySaga from "./army/sagas";
+import {interactionActions, stateUpdaters} from "./actions";
+import { BigNumber } from "@waves/bignumber";
 
 
 class GameSagas {
@@ -13,6 +18,7 @@ class GameSagas {
         yield call(HeroSaga.updateHero, DELAY);
         yield call(GoldSaga.updateGold, DELAY);
         yield call(ManaSaga.updateMana, DELAY);
+        yield call(ArmySaga.updateArmy, DELAY);
     }
 
     static *runProcess() {
@@ -21,6 +27,53 @@ class GameSagas {
             yield delay(DELAY);
             yield call(GameSagas.ticker, { DELAY });
         }
+    }
+
+    static *saveGame() {
+        const data = yield select(state => state.game);
+        var blob = new Blob([JSON.stringify(data)], { type: "text/plain;charset=utf-8" });
+        saveAs(blob, `conquer-underworld-${new Date}.txt`);
+    }
+
+    static *loadGame({payload}) {
+        const mapObject = (obj, cb) => Object.entries(obj).reduce(
+                (accum, [key, value]) => ({...accum, [key]: cb(value)}),
+                {}
+            );
+        console.log('loadedContent: ', payload);
+        try {
+            const content = JSON.parse(payload);
+            const result = {
+                gold: {
+                    gold: new BigNumber(content.gold.gold),
+                    units: mapObject(content.gold.units, v => new BigNumber(v)),
+                    upgrades: mapObject(content.gold.upgrades, v => new BigNumber(v)),
+                },
+                mana: {
+                    mana: new BigNumber(content.mana.mana),
+                    units: mapObject(content.mana.units, v => new BigNumber(v)),
+                    upgrades: mapObject(content.mana.upgrades, v => new BigNumber(v)),
+                },
+                army: {
+                    units: mapObject(content.army.units, v => new BigNumber(v)),
+                    upgrades: mapObject(content.army.upgrades, v => new BigNumber(v)),
+                },
+                hero: {
+                    energy: {
+                        value: new BigNumber(content.hero.energy.value)
+                    },
+                    training: mapObject(content.hero.training, v => new BigNumber(v)),
+                }
+            }
+            yield put(stateUpdaters.load.make(result));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    static *listener() {
+        yield takeLatest(interactionActions.save.type, GameSagas.saveGame);
+        yield takeLatest(interactionActions.load.type, GameSagas.loadGame);
     }
 
 }
