@@ -1,6 +1,6 @@
 * {
     font-family: 'Cinzel', serif;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .wrap {
@@ -55,6 +55,14 @@
     border-left-color: #362950;
     height: 100%;
     box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.units-screen .units .unit-item .inner p{
+    width: 180px;
+    font-size: 14px;
 }
 
 .units-screen .units .unit-item p {
@@ -104,4 +112,13 @@ button.big {
 
 .sidebar {
     margin-right: 10px;
+}
+
+.upgrade {
+    border-top: 1px solid #383c44;
+    margin-top: 10px;
+}
+
+.main-desc-area {
+    padding-bottom: 20px;
 }

@@ -17,7 +17,8 @@ const ArmyUnit = ({unit, qty}) => {
         onClick={e => dispatch(stateUpdaters.setArmyUnit.make(unit.id))}
     >
         <div className={'inner'}>
-            <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
+            <p>{unit.name}</p>
+            <span>{formatBig(quantity.roundTo(0))}</span>
         </div>
     </div>)
 }
@@ -39,7 +40,7 @@ function Army() {
 
     return(<div className={classNames('army-screen','units-screen')}>
         <div className={'units'}>
-            <Scrollbars style={{ width: 220, height: '100vh' }}>
+            <Scrollbars style={{ width: 280, height: '100vh' }}>
             {armyUnits.map(one => <ArmyUnit unit={one} qty={army.units ? army.units[one.id] : null}/>)}
             </Scrollbars>
         </div>

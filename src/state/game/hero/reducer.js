@@ -9,7 +9,11 @@ const initialState = {
     },
     training: {
         energyLevel: new BigNumber(0),
-        energyRegenLevel: new BigNumber(0)
+        energyRegenLevel: new BigNumber(0),
+        autoPurchase: {
+            energyLevel: false,
+            energyRegenLevel: false,
+        }
     },
     necklaces: {
         mana: new BigNumber(0),
@@ -86,5 +90,15 @@ export default makeReducer(
                 }
             }
         }
-    })
+    }),
+    on(stateUpdaters.setAutopurchase, (state, { payload }) => ({
+        ...state,
+        training: {
+            ...state.training,
+            autoPurchase: {
+                ...state.training.autoPurchase,
+                [payload.id]: payload.value,
+            }
+        }
+    }))
     )

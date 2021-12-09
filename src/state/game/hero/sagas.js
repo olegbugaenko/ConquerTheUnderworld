@@ -45,6 +45,13 @@ class HeroSaga {
 
         yield put(HeroStateActions.regenEnergy.make(eRegen.mul(DELAY / 1000)));
         const calculations = yield call(HeroSaga.updatePurchaseConstrains, currentData.training);
+        if(prestige.upgrades.autoTrain && prestige.upgrades.autoTrain.gt(0)) {
+            for(const cost of calculations) {
+                if(cost.isAvailable && currentData.training.autoPurchase[cost.id]) {
+                    yield put(interactionActions.purchaseSkill.make(cost.id));
+                }
+            }
+        }
         yield put(UiStateActions.setTrainingCalculated.make(calculations));
         const necklaces = yield call(HeroSaga.getNecklacePrices);
         yield put(UiStateActions.setNecklacesCalculated.make({

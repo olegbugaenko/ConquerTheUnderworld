@@ -18,7 +18,8 @@ const GoldUnit = ({unit, qty}) => {
         onClick={e => dispatch(stateUpdaters.setGoldUnit.make(unit.id))}
     >
         <div className={'inner'}>
-            <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
+            <p>{unit.name} </p>
+            <span>{formatBig(quantity.roundTo(0))}</span>
         </div>
     </div>)
 }
@@ -40,7 +41,7 @@ function Gold() {
 
     return(<div className={classNames('units-screen','gold-screen')}>
         <div className={'units'}>
-            <Scrollbars style={{ width: 220, height: '100vh' }}>
+            <Scrollbars style={{ width: 280, height: '100vh' }}>
             {goldUnits.map(one => <GoldUnit unit={one} qty={gold.units ? gold.units[one.id] : null}/>)}
             </Scrollbars>
         </div>

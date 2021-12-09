@@ -7,6 +7,7 @@ export const stateUpdaters = {
     updateSkillLevel: createAction('UPDATE_ENERGY_SKILL', ({ id, level }) => ({ id, level })),
     addNecklace: createAction('ADD_NECKLACE', id => id),
     addNecklaceToUnit: createAction('ADD_NECKLACE_TO_UNIT', ({ necklaceId, unitId}) => ({ necklaceId, unitId})),
+    setAutopurchase: createAction('SET_AUTOPURCHASE', ({ id, value }) => ({ id, value })),
 }
 
 export const interactionActions = {

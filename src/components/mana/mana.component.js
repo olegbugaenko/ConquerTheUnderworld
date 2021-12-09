@@ -18,7 +18,8 @@ const ManaUnit = ({unit, qty}) => {
         onClick={e => dispatch(stateUpdaters.setManaUnit.make(unit.id))}
     >
         <div className={'inner'}>
-            <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
+            <p>{unit.name} </p>
+            <span>{formatBig(quantity.roundTo(0))}</span>
         </div>
     </div>)
 }
@@ -39,7 +40,7 @@ function Mana() {
     }))
     return(<div className={classNames('mana-screen', 'units-screen')}>
         <div className={'units'}>
-            <Scrollbars style={{ width: 220, height: '100vh' }}>
+            <Scrollbars style={{ width: 280, height: '100vh' }}>
             {manaUnits.map(one => <ManaUnit unit={one} qty={mana.units ? mana.units[one.id] : null}/>)}
             </Scrollbars>
         </div>
