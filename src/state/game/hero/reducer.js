@@ -10,6 +10,16 @@ const initialState = {
     training: {
         energyLevel: new BigNumber(0),
         energyRegenLevel: new BigNumber(0)
+    },
+    necklaces: {
+        mana: new BigNumber(0),
+        gold: new BigNumber(0),
+        perUnit_mana: {
+
+        },
+        perUnit_gold: {
+
+        }
     }
 }
 
@@ -48,5 +58,33 @@ export default makeReducer(
             ...state.training,
             [payload.id]: (state.training[payload.id] || new BigNumber(0)).add(payload.level)
         }
-    }))
+    })),
+    on(stateUpdaters.addNecklace, (state, { payload }) => ({
+        ...state,
+        necklaces: {
+            ...state.necklaces,
+            [payload.id]: (state.necklaces[payload.id] || new BigNumber(0)).add(1)
+        }
+    })),
+    on(stateUpdaters.addNecklaceToUnit, (state, { payload }) => {
+        const key = `perUnit_${payload.necklaceId}`;
+        let currentUsed = new BigNumber(0);
+        for(const unit in state.necklaces[key]) {
+            currentUsed = currentUsed.add(state.necklaces[key][unit]);
+        }
+        if(!state.necklaces[payload.necklaceId] || state.necklaces[payload.necklaceId].lt(currentUsed)) {
+            console.log('No Way! ', currentUsed.valueOf());
+            return state;
+        }
+        return {
+            ...state,
+            necklaces: {
+                ...state.necklaces,
+                [key]: {
+                    ...state.necklaces[key],
+                    [payload.unitId]: (state.necklaces[key][payload.unitId] || new BigNumber(0)).add(1)
+                }
+            }
+        }
+    })
     )

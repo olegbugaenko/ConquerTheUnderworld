@@ -39,6 +39,10 @@ export default makeReducer(
         ...state,
         trainingCalculations: payload,
     }}),
+    on(stateUpdaters.setNecklacesCalculated, (state, { payload }) => { return {
+        ...state,
+        necklacesCalculations: payload,
+    }}),
     on(stateUpdaters.setArmyUnitCalculated, (state, { payload }) => { return {
         ...state,
         armyCalculations: payload,
@@ -46,5 +50,9 @@ export default makeReducer(
     on(stateUpdaters.setUnitUpgradesAvailable, (state, { payload }) => { return {
         ...state,
         availableUpgrades: payload,
+    }}),
+    on(stateUpdaters.setPrestigeCalculated, (state, { payload }) => { return {
+        ...state,
+        prestigeCalculations: payload,
     }})
     )

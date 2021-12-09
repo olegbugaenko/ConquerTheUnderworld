@@ -16,7 +16,9 @@ const ArmyUnit = ({unit, qty}) => {
         className={'unit-item'}
         onClick={e => dispatch(stateUpdaters.setArmyUnit.make(unit.id))}
     >
-        <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
+        <div className={'inner'}>
+            <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
+        </div>
     </div>)
 }
 
@@ -69,7 +71,7 @@ function Army() {
                         {armyCalculations && (<>
                             <div className={'costArea'}>
                                 <p>Each {currentUnit.name} costs:</p>
-                                <CostComponent cost={armyCalculations.perUnit.cost} />
+                                <CostComponent cost={armyCalculations.perUnit?.cost} />
                             </div>
                             <div className={'purchaseArea'}>
                                 <div><button
@@ -81,15 +83,15 @@ function Army() {
                                 <div><button
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
-                                        amount: armyCalculations.per10Percent.qty
+                                        amount: armyCalculations.per10Percent?.qty
                                     }))}
-                                >Buy {formatBig(armyCalculations.per10Percent.qty)}</button></div>
+                                >Buy {formatBig(armyCalculations.per10Percent?.qty)}</button></div>
                                 <div><button
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
-                                        amount: armyCalculations.perMax.qty
+                                        amount: armyCalculations.perMax?.qty
                                     }))}
-                                >Buy {formatBig(armyCalculations.perMax.qty)}</button></div>
+                                >Buy {formatBig(armyCalculations.perMax?.qty)}</button></div>
 
                             </div></>)}
                     </div>

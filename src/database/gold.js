@@ -17,7 +17,7 @@ export const goldUnits = [{
     cost: {
         energy: new BigNumber(1),
         gold: new BigNumber(100),
-        mana: new BigNumber(2),
+        mana: new BigNumber(10),
         unit: {
             skeleton: new BigNumber(100)
         }
@@ -33,7 +33,7 @@ export const goldUnits = [{
     cost: {
         energy: new BigNumber(1),
         gold: new BigNumber(1000),
-        mana: new BigNumber(4),
+        mana: new BigNumber(2000),
         unit: {
             sumonner0: new BigNumber(2000)
         }
@@ -49,7 +49,7 @@ export const goldUnits = [{
     cost: {
         energy: new BigNumber(1),
         gold: new BigNumber(10000),
-        mana: new BigNumber(5),
+        mana: new BigNumber(400000),
         unit: {
             sumonner1: new BigNumber(40000)
         }
@@ -69,7 +69,7 @@ export const goldUnits = [{
                 cost: {
                     energy: new BigNumber(i),
                     gold: new BigNumber(10).pow(i*i),
-                    mana: new BigNumber(2).mul(i-1),
+                    mana: new BigNumber(10).pow(i*i).mul(i),
                     unit: {
                         [`sumonner${i-1}`]: new BigNumber(10).pow(i*i).mul(i+1)
                     }

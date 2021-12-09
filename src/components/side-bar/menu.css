@@ -1,6 +1,11 @@
 .menu-item {
     padding: 5px;
     border-bottom: 1px solid #555;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: #362950;
 }
 
 .menu-item p {

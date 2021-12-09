@@ -28,6 +28,10 @@ class ArmySaga {
             : one => Array.isArray(one.targetId)
                 ? one.targetId.includes(targetId)
                 : one.targetId === targetId;
+        /*if(upgradeId) {
+            console.log('purchasing: ', upgradeId, flt, armyUnitsUpgrades.filter(flt), currentLevels);
+        }*/
+
         return yield all(armyUnitsUpgrades.filter(flt).map(function* (one) {
 
             return yield call(CalculateSaga.updateSkillOrUpgradeConstrains, {
@@ -46,6 +50,7 @@ class ArmySaga {
 
     static *updateArmy(DELAY) {
         const currentData = yield select(state => state.game.army);
+        const {prestige, battle} = yield select(state => state.game);
         const { armyUnit, page } = yield select(state => state.ui);
         const units = [];
         const ECP = {};
@@ -61,6 +66,14 @@ class ArmySaga {
                 armyUnitsUpgrades
             );
 
+            let pB = new BigNumber(1);
+
+            pB = pB.mul(
+                new BigNumber(1).add((prestige.upgrades.rage1 || new BigNumber(0))
+                    .mul((battle.maxLevel || new BigNumber(0)))
+                    .mul(new BigNumber(0.01)))
+            );
+
             // console.log(goldUnits[i].id, bonus.toFixed(2));
 
             for(const key in armyUnits[i].production?.unit || {}) {
@@ -68,6 +81,7 @@ class ArmySaga {
                     id: key,
                     amount: unitAmount
                         .mul(bonus)
+                        .mul(pB)
                         .mul(armyUnits[i].production.unit[key])
                         .mul(DELAY / 1000)
                 });
@@ -76,6 +90,7 @@ class ArmySaga {
                         ...(ECP.unit || {}),
                         [key]: unitAmount
                             .mul(bonus)
+                            .mul(pB)
                             .mul(armyUnits[i].production.unit[key])
                     }
                 }
@@ -88,18 +103,40 @@ class ArmySaga {
             if(armyUnits[i].stats) {
                 const statsFinal = {};
                 ['at','df','hp'].forEach(statKey => {
-                    const stat = armyUnits[i].stats[statKey];
+                    bonus = CalculateSaga.getEffiencyBonus(
+                        armyUnits[i],
+                        currentData.upgrades,
+                        armyUnitsUpgrades.filter(u => u.id === `${armyUnits[i].id}_${statKey}`)
+                    );
+
+                    let stat = armyUnits[i].stats[statKey];
                     if(stat) {
+                        stat = stat.mul(bonus);
+                        if(statKey === 'at') {
+                            stat = stat.mul(new BigNumber(1.2).pow(
+                                prestige.upgrades.attack1 || new BigNumber(0)
+                            ))
+                        }
+                        if(statKey === 'df') {
+                            stat = stat.mul(new BigNumber(1.2).pow(
+                                prestige.upgrades.defense1 || new BigNumber(0)
+                            ))
+                        }
                         statsFinal[statKey] = stat
-                            .mul(unitAmount);
+                            .mul(unitAmount)
+                            .mul(pB);
+                        if(statKey === 'hp') {
+                            statsFinal.hpPerUnit = stat;
+                        }
                         if(page === 'army' && armyUnit === armyUnits[i].id) {
                             ECP.stats = {
                                 ...(ECP.stats || {}),
-                                [statKey]: statsFinal[statKey]
+                                [statKey]: statsFinal[statKey],
                             }
                         }
                     }
                 })
+                // console.log('statsFinal: ', statsFinal);
                 yield put(ArmyStateActions.setStats.make(statsFinal));
             }
         }
@@ -128,7 +165,7 @@ class ArmySaga {
     }
 
     static *purchaseUpgrade({payload}) {
-        const currentData = yield select(state => state.game.gold);
+        const currentData = yield select(state => state.game.army);
         const calculations = yield call(
             ArmySaga.updateUpgradeConstrains,
             null,

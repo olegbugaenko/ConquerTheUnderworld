@@ -1,14 +1,18 @@
 .gold-screen .units {
-    background: #504020;
+
+}
+
+.gold-screen .units .unit-item .inner {
+    border-left-color: #a06535;
 }
 
 .gold-screen .units .unit-item{
-    border-bottom: 1px solid #605030;
+
 }
 
 
-.gold-screen .units .unit-item:hover{
-    background: #605030;
+.gold-screen .units .unit-item:hover .inner{
+    border-left-color: #c08030;
 }
 
 .gold-screen .unit-details {

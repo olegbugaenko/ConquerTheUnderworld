@@ -1,14 +1,14 @@
 .mana-screen .units {
-    background: #204050;
+
 }
 
-.mana-screen .units .unit-item{
-    border-bottom: 1px solid #305060;
+.mana-screen .units .unit-item .inner{
+    border-left-color: #206080;
 }
 
 
-.mana-screen .units .unit-item:hover{
-    background: #305060;
+.mana-screen .units .unit-item:hover .inner{
+    border-left-color: #307090;
 }
 
 .mana-screen .unit-details {

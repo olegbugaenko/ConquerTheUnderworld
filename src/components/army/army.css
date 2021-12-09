@@ -1,14 +1,14 @@
 .army-screen .units {
-    background: #602020;
+
 }
 
-.army-screen .units .unit-item{
-    border-bottom: 1px solid #803030;
+.army-screen .units .unit-item .inner{
+    border-left-color: #702020;
 }
 
 
-.army-screen .units .unit-item:hover{
-    background: #803030;
+.army-screen .units .unit-item:hover .inner{
+    border-left-color: #903030;
 }
 
 .army-screen .unit-details {

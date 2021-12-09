@@ -8,11 +8,14 @@ import {stateUpdaters as GoldStateUpdaters} from "./gold/actions";
 import {stateUpdaters as HeroStateUpdaters} from "./hero/actions";
 import {stateUpdaters as ManaStateUpdaters} from "./mana/actions";
 import {stateUpdaters as TerritoryStateUpdaters} from "./territory/actions";
+import {stateUpdaters as ArmyStateUpdaters } from "./army/actions";
+import {stateUpdaters as PrestigeStateUpdaters } from "./prestige/actions";
 import {goldUnits, goldUnitsUpgrades} from "../../database/gold";
+import {prestiges} from "../../database/prestige";
 
 class CalculateSaga{
 
-    static *getEffiencyBonus(unit, upgrades, list) {
+    static getEffiencyBonus(unit, upgrades, list) {
         let bonus = new BigNumber(1.0);
         list.filter(
             one => Array.isArray(one.targetId)
@@ -28,13 +31,27 @@ class CalculateSaga{
     }
 
     static *updateSkillOrUpgradeConstrains(skill, state) {
-        const { gold, mana, territory, hero, secondary } = state;
+        const { gold, mana, territory, hero, secondary, prestige, army } = state;
         let maxAmount = new BigNumber('1.e+999999');
         const costs = {};
-        const levelCosts = skill.cost(skill.level)
+        const levelCosts = skill.cost(skill.level);
+        skill.discount = skill.discount || new BigNumber(1.0);
         for(const key in levelCosts) {
+            if(key === 'prestige') {
+                for(const prestigeId in levelCosts.prestige) {
+                    costs['prestige'] = {
+                        ...costs['prestige'],
+                        [prestigeId]: levelCosts.prestige[prestigeId].mul(skill.discount),
+                    }
+                    let actualAmount = prestige.prestige[prestigeId] || new BigNumber(0);
+                    maxAmount = BigNumber.min(
+                        maxAmount,
+                        actualAmount.div(levelCosts.prestige[prestigeId].mul(skill.discount))
+                    );
+                }
+            } else
             if(key !== 'unit') {
-                costs[key] = levelCosts[key];
+                costs[key] = levelCosts[key].mul(skill.discount);
                 let actualAmount = 0;
                 if(key === 'gold') {
                     actualAmount = gold?.gold;
@@ -47,7 +64,8 @@ class CalculateSaga{
                 } else
                 if(key === 'energy') {
                     actualAmount = hero?.energy?.value;
-                } else {
+                } else
+                 {
                     actualAmount = secondary ? secondary[key] : new BigNumber(0)
                 }
                 maxAmount = BigNumber.min(
@@ -58,10 +76,11 @@ class CalculateSaga{
                 for(const costUnitId in levelCosts.unit) {
                     costs['unit'] = {
                         ...costs['unit'],
-                        [costUnitId]: levelCosts.unit[costUnitId],
+                        [costUnitId]: levelCosts.unit[costUnitId].mul(skill.discount),
                     }
                     let units = gold?.units[costUnitId]
                         || mana?.units[costUnitId]
+                        || army?.units[costUnitId]
                         || territory?.units[costUnitId];
 
                     if(!units) {
@@ -83,8 +102,17 @@ class CalculateSaga{
     }
 
     static *subtractResources(costs) {
-        const { gold, mana, territory, hero, secondary } = yield select(state => state.game);
+        const { gold, mana, territory, hero, secondary, army } = yield select(state => state.game);
         for(const key in costs) {
+            if(key === 'prestige') {
+                for(const prestigeId in costs.prestige) {
+                    let actualAmount = costs.prestige[prestigeId] || new BigNumber(0);
+                    yield put(PrestigeStateUpdaters.addPrestige.make({
+                        id: prestigeId,
+                        amount: actualAmount.mul(-1)
+                    }))
+                }
+            } else
             if(key !== 'unit') {
                 let cost = costs[key];
                 if(key === 'gold') {
@@ -106,6 +134,7 @@ class CalculateSaga{
             } else {
                 for(const costUnitId in costs.unit) {
                     let unit = gold?.units[costUnitId];
+                    console.log('costUnitIdGold', costUnitId, unit, costs.unit[costUnitId]);
                     if(unit) {
                         yield put(GoldStateUpdaters.updateUnit.make({
                             id: costUnitId,
@@ -114,6 +143,7 @@ class CalculateSaga{
                         continue;
                     }
                     unit = mana?.units[costUnitId];
+                    console.log('costUnitIdMana', costUnitId, unit, costs.unit[costUnitId]);
                     if(unit) {
                         yield put(ManaStateUpdaters.updateUnit.make({
                             id: costUnitId,
@@ -122,8 +152,18 @@ class CalculateSaga{
                         continue;
                     }
                     unit = territory?.units[costUnitId];
+                    console.log('costUnitIdTerr', costUnitId, unit, costs.unit[costUnitId]);
                     if(unit) {
                         yield put(TerritoryStateUpdaters.updateUnit.make({
+                            id: costUnitId,
+                            amount: costs.unit[costUnitId].mul(-1),
+                        }));
+                        continue;
+                    }
+                    unit = army?.units[costUnitId];
+                    console.log('costUnitIdArmy', costUnitId, unit, costs.unit[costUnitId].mul(-1).valueOf());
+                    if(unit) {
+                        yield put(ArmyStateUpdaters.updateUnit.make({
                             id: costUnitId,
                             amount: costs.unit[costUnitId].mul(-1),
                         }));
@@ -160,11 +200,14 @@ class CalculateSaga{
             perMax: {},
             final: {}
         }
-        const { gold, mana, territory, hero, secondary } = yield select(state => state.game);
+        const { gold, mana, army, hero, secondary, territory } = yield select(state => state.game);
         const costs = {};
         for(const key in unitData.cost) {
             if(key !== 'unit') {
                 costs[key] = unitData.cost[key];
+                if(unitData.discount && (key in unitData.discount)) {
+                    costs[key] = costs[key].mul(unitData.discount[key]);
+                }
                 let actualAmount = 0;
                 if(key === 'gold') {
                     actualAmount = gold?.gold;
@@ -192,7 +235,7 @@ class CalculateSaga{
                     }
                     let units = gold?.units[costUnitId]
                         || mana?.units[costUnitId]
-                        || territory?.units[costUnitId];
+                        || army?.units[costUnitId];
                     if(!units) {
                         maxAmount = new BigNumber(0);
                     } else {

@@ -1,5 +1,5 @@
 * {
-    font-family: "Century Gothic";
+    font-family: 'Cinzel', serif;
     font-size: 14px;
 }
 
@@ -7,6 +7,7 @@
     box-sizing: border-box;
     display: flex;
     height: 100vh;
+    background: #102023;
 }
 
 .wrap .sidebar {
@@ -31,12 +32,29 @@
 
 .units-screen .units {
     height: 100vh;
+    border-right: 1px solid #383c44;
 }
 
 .units-screen .units .unit-item{
-    padding: 10px;
+    padding: 5px;
     cursor: pointer;
     color: #fff;
+    height: 45px;
+    background: #282c34;
+    border-bottom: 1px solid #383c44;
+}
+
+.units-screen .units .unit-item:hover{
+    background: #383c44;
+}
+
+.units-screen .units .unit-item .inner {
+    padding: 5px;
+    border: none;
+    border-left: 3px solid;
+    border-left-color: #362950;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .units-screen .units .unit-item p {
@@ -54,7 +72,7 @@
     flex: 1;
 }
 
-.unit-details .columns {
+.columns {
     display: flex;
     justify-content: space-around;
 }
@@ -65,4 +83,25 @@
 
 .purchaseArea {
     padding-top: 20px;
+}
+
+button {
+    padding: 3px 10px;
+    min-width: 80px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #000;
+    color: #fff;
+    box-shadow: none;
+    outline: none;
+    border: 1px solid #204050;
+    margin: 2px;
+}
+button.big {
+    padding: 3px 10px;
+    width: 130px;
+}
+
+.sidebar {
+    margin-right: 10px;
 }

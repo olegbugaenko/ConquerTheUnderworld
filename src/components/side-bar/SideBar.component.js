@@ -5,6 +5,7 @@ import './menu.css'
 import formatBig from "../general/fmt-val";
 import {interactionActions} from "../../state/game/actions";
 import {useRef} from "react";
+import { prophecies, prestiges } from "../../database/prestige";
 
 function SideBar() {
     const inputFile = useRef(null);
@@ -12,6 +13,8 @@ function SideBar() {
     const gold = useSelector(state => state.game.gold || {});
     const mana = useSelector(state => state.game.mana || {});
     const army = useSelector(state => state.game.army || {});
+    const battle = useSelector(state => state.game.battle || {});
+    const prestige = useSelector(state => state.game.prestige || {});
     const page = useSelector(state => state.ui.page || {});
     const dispatch = useDispatch();
     const onButtonClick = () => {
@@ -36,6 +39,71 @@ function SideBar() {
         }
 
     }
+
+    if(prestige.isPrestiging) {
+        return (<aside>
+            <div
+                className={classNames({
+                    'menu-item': 1,
+                    'active': page === prophecies[0].id
+                })}
+                onClick={e => dispatch(uiActions.setPage.make(prophecies[0].id))}
+            >
+                <p>
+                    {prophecies[0].name}
+            </p>
+            </div>
+            <div
+                className={classNames({
+                    'menu-item': 1,
+                    'active': page === prophecies[1].id
+                })}
+                onClick={e => dispatch(uiActions.setPage.make(prophecies[1].id))}
+            >
+                <p>
+                    {prophecies[1].name}
+                </p>
+            </div>
+            <div
+                className={classNames({
+                    'menu-item': 1,
+                    'active': page === prophecies[2].id
+                })}
+                onClick={e => dispatch(uiActions.setPage.make(prophecies[2].id))}
+            >
+                <p>
+                    {prophecies[2].name}
+                </p>
+            </div>
+            {prestige.upgrades.warrior1 && prestige.upgrades.warrior1.gt(0) && (
+                <div
+                    className={classNames({
+                        'menu-item': 1,
+                        'active': page === prophecies[3].id
+                    })}
+                    onClick={e => dispatch(uiActions.setPage.make(prophecies[3].id))}
+                >
+                    <p>
+                        {prophecies[3].name}
+                    </p>
+                </div>
+            )}
+            {prestige.upgrades.merchant1 && prestige.upgrades.merchant1.gt(0) && (
+                <div
+                    className={classNames({
+                        'menu-item': 1,
+                        'active': page === prophecies[4].id
+                    })}
+                    onClick={e => dispatch(uiActions.setPage.make(prophecies[4].id))}
+                >
+                    <p>
+                        {prophecies[4].name}
+                    </p>
+                </div>
+            )}
+        </aside>)
+    }
+
     return(<aside>
         <div
             className={classNames({
@@ -46,9 +114,9 @@ function SideBar() {
         >
             <p>
                 {'Energy: '}</p><p>
-                {formatBig(energy.value)}
+                {formatBig(energy.value?.roundTo(0))}
                 {' / '}
-                {formatBig(energy.maxValue)}
+                {formatBig(energy.maxValue?.roundTo(0))}
             </p>
         </div>
         <div
@@ -60,7 +128,7 @@ function SideBar() {
         >
             <p>
                 {'Gold: '}
-            {formatBig(gold.gold)}
+            {formatBig(gold.gold.roundTo(0))}
         </p>
         </div>
         <div
@@ -72,7 +140,7 @@ function SideBar() {
         >
             <p>
                 {'Mana: '}
-                {formatBig(mana.mana)}
+                {formatBig(mana.mana.roundTo(0))}
             </p>
         </div>
         <div
@@ -84,7 +152,19 @@ function SideBar() {
         >
             <p>
                 {'Army: '}
-                {formatBig(army.units?.warrior0)}
+                {formatBig(army.units?.warrior0?.roundTo(0))}
+            </p>
+        </div>
+        <div
+            className={classNames({
+                'menu-item': 1,
+                'active': page === 'battle'
+            })}
+            onClick={e => dispatch(uiActions.setPage.make('battle'))}
+        >
+            <p>
+                {'Battle: '}
+                {formatBig(battle.level)}
             </p>
         </div>
         <div></div>

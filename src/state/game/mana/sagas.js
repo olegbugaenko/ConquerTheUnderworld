@@ -38,12 +38,30 @@ class ManaSaga {
     }
 
     static *updatePurchaseConstrains(unitId, qty) {
-        const unitData = manaUnits.find(one => one.id === unitId);
+
+        const unitDataId = manaUnits.findIndex(one => one.id === unitId);
+        if(unitDataId < 0) return null;
+        const unitData = manaUnits[unitDataId];
+        let discount = {};
+        if(unitDataId < manaUnits.length - 1) {
+            const upperTierId = manaUnits[unitDataId + 1].id;
+            const upperTierAmount = yield select(state => state.game.mana.units[upperTierId] || new BigNumber(0));
+            const prestige = yield select(state => state.game.prestige.upgrades);
+            discount['energy'] = BigNumber.max(
+                new BigNumber(0.25).pow(prestige?.hireCost1 || 0),
+                new BigNumber(1).div(upperTierAmount.add(1).sqrt().sqrt())
+            );
+
+            // set discount to obj
+            unitData.discount = discount;
+        }
         return yield call(CalculateSaga.updatePurchaseConstrains, unitData, qty);
     }
 
     static *updateMana(DELAY) {
         const currentData = yield select(state => state.game.mana);
+        const prestige = yield select(state => state.game.prestige);
+        const {hero, battle} = yield select(state => state.game);
         const { manaUnit, page } = yield select(state => state.ui);
         const units = [];
         const ECP = {};
@@ -56,21 +74,28 @@ class ManaSaga {
                 currentData.upgrades,
                 manaUnitsUpgrades
             );
+            let pB = new BigNumber(1).add((prestige.upgrades.rage1 || new BigNumber(0))
+                .mul((battle.maxLevel || new BigNumber(0)))
+                .mul(new BigNumber(0.01)));
+
+            pB = pB.mul((hero.necklaces.perUnit_mana[manaUnits[i].id] || new BigNumber(0)).mul(0.5).add(1));
+
             for(const key in manaUnits[i].production.unit || {}) {
                 // some further transforms, bonuses and so on should be in here
+                const income = unitAmount
+                    .mul(bonus)
+                    .mul(pB)
+                    .mul(manaUnits[i].production.unit[key])
+                    .mul((prestige.upgrades.allManaUnits1 || new BigNumber(0)).mul(0.2).add(1));
                 units.push({
                     id: key,
-                    amount: unitAmount
-                        .mul(bonus)
-                        .mul(manaUnits[i].production.unit[key])
+                    amount: income
                         .mul(DELAY / 1000)
                 });
                 if(page === 'mana' && manaUnit === manaUnits[i].id) {
                     ECP.unit = {
                         ...(ECP.unit || {}),
-                        [key]: unitAmount
-                            .mul(bonus)
-                            .mul(manaUnits[i].production.unit[key])
+                        [key]: income,
                     }
                 }
                 // some further transforms, bonuses and so on should be in here
@@ -80,11 +105,14 @@ class ManaSaga {
                 }))*/
             }
             if(manaUnits[i].production.mana) {
-                const mana = unitAmount.mul(manaUnits[i].production.mana).mul(DELAY / 1000);
+                const income = unitAmount
+                    .mul(bonus)
+                    .mul(pB)
+                    .mul(manaUnits[i].production.mana)
+                    .mul((prestige.upgrades.mana1 || new BigNumber(0)).add(1));
+                const mana = income.mul(DELAY / 1000);
                 if(page === 'mana' && manaUnit === manaUnits[i].id) {
-                    ECP.mana = unitAmount
-                        .mul(bonus)
-                        .mul(manaUnits[i].production.mana);
+                    ECP.mana = income;
                 }
                 yield put(ManaStateActions.addMana.make(mana));
             }
@@ -113,7 +141,7 @@ class ManaSaga {
     }
 
     static *purchaseUpgrade({payload}) {
-        const currentData = yield select(state => state.game.gold);
+        const currentData = yield select(state => state.game.mana);
         const calculations = yield call(
             ManaSaga.updateUpgradeConstrains,
             null,

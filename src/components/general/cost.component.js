@@ -41,6 +41,27 @@ const CostComponent = ({ cost }) => {
                     amount: cost.stats[statsKey]
                 });
             }
+        } else if(key === 'prestige') {
+            for (const statsKey in cost.prestige) {
+                switch (statsKey) {
+                    case 'at':
+                        title = 'Attack';
+                        break;
+                    case 'df':
+                        title = 'Defense';
+                        break;
+                    case 'hp':
+                        title = 'HP';
+                        break;
+                    default:
+                        title = `${statsKey} prestige`;
+                        break;
+                }
+                costArray.push({
+                    title,
+                    amount: cost.prestige[statsKey]
+                });
+            }
         } else {
             switch (key) {
                 case 'gold':
@@ -63,7 +84,7 @@ const CostComponent = ({ cost }) => {
     return (<div className={'costs'}>
         {
             costArray.map(({ title, amount }) => (<p>
-                {formatBig(amount)}
+                {formatBig(amount ? amount.roundTo(5) : amount)}
                 {' '}
                 {title}
             </p>))

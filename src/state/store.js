@@ -13,6 +13,7 @@ import GoldSaga from "./game/gold/sagas";
 import ManaSaga from "./game/mana/sagas";
 import HeroSaga from "./game/hero/sagas";
 import ArmySaga from "./game/army/sagas";
+import PrestigeSaga from "./game/prestige/saga";
 
 
 const mainReducer = combineReducers({
@@ -38,4 +39,5 @@ export const store = createStore(
     ManaSaga.listener,
     HeroSaga.listener,
     ArmySaga.listener,
+    PrestigeSaga.listener,
 ].map(saga => sagaMiddleware.run(saga));

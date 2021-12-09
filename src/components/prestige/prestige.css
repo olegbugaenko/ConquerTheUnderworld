@@ -1,0 +1,25 @@
+.prestiges {
+    background: #222;
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.prestiges .settings {
+    height: 100px;
+}
+
+.prestiges .prestige-items {
+    flex-wrap: wrap;
+}
+
+.prestiges .prestige-item {
+    width: 350px;
+    padding: 10px;
+}
+
+.prestige-item .inner-wrap {
+    background: #602020;
+    padding: 10px;
+}

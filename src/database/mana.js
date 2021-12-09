@@ -67,15 +67,39 @@ export const manaUnits = [{
         gold: new BigNumber('9e17'),
         mana: new BigNumber('1.2e13'),
         unit: {
-            mage2: new BigNumber(40000)
+            mage3: new BigNumber('6.e+6')
         }
     },
     production: {
         unit: {
-            mage2: new BigNumber(3)
+            mage3: new BigNumber(3)
         }
     }
-}]
+},
+    ...(()=>{
+    const result = [];
+    for(let i = 5; i < 50; i++) {
+        result.push({
+            id: `mage${i}`,
+            name: `Skeleton mage summoner ${i}`,
+            cost: {
+                energy: new BigNumber(10).pow(i*(i-3)-1),
+                gold: new BigNumber(10).pow(i*i),
+                mana: new BigNumber(10).pow(i*(i-2)).mul(i),
+                unit: {
+                    [`sumonner${i-1}`]: new BigNumber(10).pow(i*(i-2)-4).mul(i+1)
+                }
+            },
+            production: {
+                unit: {
+                    [`sumonner${i-1}`]: new BigNumber(i+1)
+                }
+            }
+        })
+    }
+    return result;
+})()
+]
 
 export const manaUnitsUpgrades = [{
     id: 'mage0Effiency',
@@ -127,4 +151,32 @@ export const manaUnitsUpgrades = [{
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
-}]
+},{
+    id: 'mage5Effiency',
+    targetId: 'mage5',
+    name: 'Effiency',
+    cost: (level) => ({
+        unit: {
+            mage4: new BigNumber(145).pow(level.add(1)).roundTo(0),
+        }
+    }),
+    effect: (level) => new BigNumber(2).pow(level),
+},
+    ...(()=>{
+        const result = [];
+        for(let i = 6; i < 50; i++) {
+            result.push({
+                id: `mage${i}Effiency`,
+                targetId: `mage${i}`,
+                name: 'Effiency',
+                cost: (level) => ({
+                    unit: {
+                        [`mage${i}`]: new BigNumber(35 + 4*i*i).pow(level.add(1)).roundTo(0),
+                    }
+                }),
+                effect: (level) => new BigNumber(2).pow(level),
+            })
+        }
+        return result;
+    })()
+]

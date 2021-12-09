@@ -3,6 +3,7 @@ import { BigNumber} from "@waves/bignumber";
 import {goldUnits, goldUnitsUpgrades} from "../../database/gold";
 import './gold.css'
 import {stateUpdaters} from "../../state/ui/actions";
+import {stateUpdaters as HeroUpdaters} from "../../state/game/hero/actions";
 import {interactionActions} from "../../state/game/gold/actions";
 import CostComponent from "../general/cost.component";
 import formatBig from "../general/fmt-val";
@@ -16,14 +17,16 @@ const GoldUnit = ({unit, qty}) => {
         className={'unit-item'}
         onClick={e => dispatch(stateUpdaters.setGoldUnit.make(unit.id))}
     >
-        <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
+        <div className={'inner'}>
+            <p>{unit.name} <span>{formatBig(quantity.roundTo(0))}</span></p>
+        </div>
     </div>)
 }
 
 function Gold() {
     const dispatch = useDispatch();
-    const { gold } = useSelector(state => state.game);
-    const { goldUnitCalculations, goldUnit, availableUpgrades } = useSelector(state => state.ui);
+    const { gold, hero } = useSelector(state => state.game);
+    const { goldUnitCalculations, goldUnit, availableUpgrades, necklacesCalculations } = useSelector(state => state.ui);
     const currentUnit = goldUnits.find(one => one.id === goldUnit);
     const upgradesAvailable = goldUnitsUpgrades.filter(
         one => Array.isArray(one.targetId)
@@ -53,6 +56,13 @@ function Gold() {
                                 <CostComponent cost={goldUnitCalculations.ECP}></CostComponent>
                             </>)}
                         </div>
+                        <p>Necklaces: {formatBig(hero.necklaces.perUnit_gold[currentUnit.id] || new BigNumber(0))}</p>
+                        <button
+                            onClick={(e) => dispatch(HeroUpdaters.addNecklaceToUnit.make({
+                                necklaceId: 'gold',
+                                unitId: currentUnit.id,
+                            }))}
+                        >Add necklace ( {formatBig(necklacesCalculations?.free?.gold || hero.necklaces.gold)} left)</button>
                         {upgradesAvailable.map(u => (<div className={'upgrade'}>
                             <p className={'upgrade-title'}>{u.name} ({formatBig(u.level.roundTo(0))})</p>
                             <CostComponent cost={u.cost.costs}></CostComponent>

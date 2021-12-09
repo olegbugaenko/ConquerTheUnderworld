@@ -18,6 +18,7 @@ import { goldUnits, goldUnitsUpgrades} from "../../../database/gold";
 import CalculateSaga from "../calculate-saga";
 import {stateUpdaters as HeroStateActions} from "../hero/actions";
 import {armyUnits} from "../../../database/army";
+import {prestiges} from "../../../database/prestige";
 
 class GoldSaga {
 
@@ -40,15 +41,33 @@ class GoldSaga {
 
 
     static *updatePurchaseConstrains(unitId, qty) {
-        const unitData = goldUnits.find(one => one.id === unitId);
+        const unitDataId = goldUnits.findIndex(one => one.id === unitId);
+        if(unitDataId < 0) return null;
+        const unitData = goldUnits[unitDataId];
+        let discount = {};
+        if(unitDataId < goldUnits.length - 1) {
+            const upperTierId = goldUnits[unitDataId + 1].id;
+            const upperTierAmount = yield select(state => state.game.gold.units[upperTierId] || new BigNumber(0));
+            const prestige = yield select(state => state.game.prestige.upgrades);
+            discount['energy'] = BigNumber.max(
+                new BigNumber(0.25).pow(prestige?.hireCost1 || 0),
+                new BigNumber(1).div(upperTierAmount.add(1).sqrt().sqrt())
+            );
+
+            // set discount to obj
+            unitData.discount = discount;
+        }
+
         return yield call(CalculateSaga.updatePurchaseConstrains, unitData, qty);
     }
 
     static *updateGold(DELAY) {
         const currentData = yield select(state => state.game.gold);
+        const {hero, prestige, battle} = yield select(state => state.game);
         const { goldUnit, page } = yield select(state => state.ui);
         const ECP = {};
         const units = [];
+
         for(let i = goldUnits.length - 1; i>-1; i--) {
             const unitAmount = currentData.units[goldUnits[i].id];
             if(!unitAmount) continue;
@@ -61,6 +80,16 @@ class GoldSaga {
                 goldUnitsUpgrades
             );
 
+            let pB = new BigNumber(1.25)
+                .pow(prestige.upgrades[`miner1_${goldUnits[i].id}`] || 0);
+
+            pB = pB.mul((hero.necklaces.perUnit_gold[goldUnits[i].id] || new BigNumber(0)).mul(0.5).add(1));
+
+            pB = pB.mul(
+                new BigNumber(1).add((prestige.upgrades.rage1 || new BigNumber(0))
+                    .mul((battle.maxLevel || new BigNumber(0)))
+                    .mul(new BigNumber(0.01)))
+            )
             // console.log(goldUnits[i].id, bonus.toFixed(2));
 
             for(const key in goldUnits[i].production.unit || {}) {
@@ -69,6 +98,7 @@ class GoldSaga {
                     amount: unitAmount
                         .mul(bonus)
                         .mul(goldUnits[i].production.unit[key])
+                        .mul(pB)
                         .mul(DELAY / 1000)
                 });
                 if(page === 'gold' && goldUnit === goldUnits[i].id) {
@@ -76,7 +106,9 @@ class GoldSaga {
                         ...(ECP.unit || {}),
                         [key]: unitAmount
                             .mul(bonus)
+                            .mul(pB)
                             .mul(goldUnits[i].production.unit[key])
+                            .roundTo(0)
                     }
                 }
                 // some further transforms, bonuses and so on should be in here
@@ -86,15 +118,15 @@ class GoldSaga {
                 }))*/
             }
             if(goldUnits[i].production.gold) {
-                const gold = unitAmount
+                const income = unitAmount
                     .mul(bonus)
                     .mul(goldUnits[i].production.gold)
+                    .mul((prestige.upgrades.gold1 || new BigNumber(0)).add(1));
+                const gold = income
                     .mul(DELAY / 1000);
                 yield put(GoldStateActions.addGold.make(gold));
                 if(page === 'gold' && goldUnit === goldUnits[i].id) {
-                    ECP.gold = unitAmount
-                        .mul(bonus)
-                        .mul(goldUnits[i].production.gold);
+                    ECP.gold = income.roundTo(0);
                 }
             }
         }

@@ -5,8 +5,14 @@ import Mana from "./mana/mana.component";
 import {useSelector} from "react-redux";
 import Energy from "./energy/energy.component";
 import Army from './army/army.component';
+import Battle from "./battle/battle.component";
+import Prestige from "./prestige/prestige.component";
 
-const renderContent = page => {
+function RenderContent ({page}) {
+    const prestige = useSelector(state => state.game.prestige);
+    if(prestige.isPrestiging) {
+        return (<Prestige></Prestige>)
+    }
     switch (page) {
         case 'gold':
             return <Gold></Gold>
@@ -16,6 +22,8 @@ const renderContent = page => {
             return <Energy></Energy>
         case 'army':
             return <Army></Army>
+        case 'battle':
+            return <Battle></Battle>
         default:
             return 'Content'
     }
@@ -28,7 +36,7 @@ function Game () {
             <div className={'sidebar'}>
                 <SideBar />
             </div>
-            <div className={'content'}>{renderContent(page)}</div>
+            <div className={'content'}><RenderContent page={page}/></div>
         </main>
     )
 }

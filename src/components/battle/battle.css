@@ -1,0 +1,16 @@
+.battle {
+    background: #222;
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.battle .settings {
+    height: 100px;
+}
+
+.battle .enemies {
+    flex: 1;
+    background: #602020;
+}
