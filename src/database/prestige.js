@@ -115,7 +115,7 @@ export const prestiges = [{
     description: 'Each level decrease training cost by 10%',
     cost: (lvl) => ({
         prestige: {
-            spiritualist: new BigNumber(1.5).pow(lvl).mul(20).roundTo(0),
+            spiritualist: new BigNumber(10).pow(lvl).mul(2000).roundTo(0),
         }
     })
 },{
@@ -126,6 +126,16 @@ export const prestiges = [{
     cost: (lvl) => ({
         prestige: {
             spiritualist: new BigNumber(1.5).pow(lvl).mul(50).roundTo(0),
+        }
+    })
+},{
+    name: 'Autopurchase',
+    id: 'autoTrain',
+    prophecyId: 'spiritualist',
+    description: 'Unlock traning autopurchase',
+    cost: (lvl) => ({
+        prestige: {
+            spiritualist: new BigNumber(2).pow(lvl).mul(500).roundTo(0),
         }
     })
 }]).concat([{

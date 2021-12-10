@@ -9,6 +9,7 @@ import formatBig from "../general/fmt-val";
 import {Scrollbars} from "react-custom-scrollbars";
 import classNames from "classnames";
 import {stateUpdaters as HeroUpdaters} from "../../state/game/hero/actions";
+import {goldUnits} from "../../database/gold";
 
 const ManaUnit = ({unit, qty}) => {
     const dispatch = useDispatch();
@@ -41,7 +42,11 @@ function Mana() {
     return(<div className={classNames('mana-screen', 'units-screen')}>
         <div className={'units'}>
             <Scrollbars style={{ width: 280, height: '100vh' }}>
-            {manaUnits.map(one => <ManaUnit unit={one} qty={mana.units ? mana.units[one.id] : null}/>)}
+            {manaUnits
+                .filter((item, index) => index <= 0 || (
+                    mana.units[manaUnits[index-1].id] && mana.units[manaUnits[index-1].id].gt(0)
+                ))
+                .map(one => <ManaUnit unit={one} qty={mana.units ? mana.units[one.id] : null}/>)}
             </Scrollbars>
         </div>
         <div className={'unit-details'}>
@@ -82,18 +87,21 @@ function Mana() {
                             </div>
                             <div className={'purchaseArea'}>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: new BigNumber(1)
                                     }))}
                                 >Buy 1</button></div>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: manaUnitCalculations?.per10Percent?.qty
                                     }))}
                                 >Buy {formatBig(manaUnitCalculations?.per10Percent?.qty)}</button></div>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: manaUnitCalculations.perMax?.qty

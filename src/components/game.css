@@ -20,7 +20,7 @@
 }
 
 .content {
-    background: #333;
+    background: #282c34;
     flex: 1;
 }
 
@@ -105,6 +105,11 @@ button {
     border: 1px solid #204050;
     margin: 2px;
 }
+
+button:hover{
+    background: #102025;
+}
+
 button.big {
     padding: 3px 10px;
     width: 130px;

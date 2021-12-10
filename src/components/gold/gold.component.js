@@ -42,7 +42,11 @@ function Gold() {
     return(<div className={classNames('units-screen','gold-screen')}>
         <div className={'units'}>
             <Scrollbars style={{ width: 280, height: '100vh' }}>
-            {goldUnits.map(one => <GoldUnit unit={one} qty={gold.units ? gold.units[one.id] : null}/>)}
+            {goldUnits
+                .filter((item, index) => index <= 0 || (
+                    gold.units[goldUnits[index-1].id] && gold.units[goldUnits[index-1].id].gt(0)
+                ))
+                .map(one => <GoldUnit unit={one} qty={gold.units ? gold.units[one.id] : null}/>)}
             </Scrollbars>
         </div>
         <div className={'unit-details'}>
@@ -81,18 +85,21 @@ function Gold() {
                             </div>
                             <div className={'purchaseArea'}>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: new BigNumber(1)
                                     }))}
                                 >Buy 1</button></div>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: goldUnitCalculations.per10Percent.qty
                                     }))}
                                 >Buy {formatBig(goldUnitCalculations.per10Percent.qty)}</button></div>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: goldUnitCalculations.perMax.qty

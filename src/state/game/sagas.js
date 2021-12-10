@@ -73,7 +73,8 @@ class GameSagas {
                         gold: new BigNumber(content.hero.necklaces?.gold || 0),
                         perUnit_gold: mapObject(content.hero.necklaces?.perUnit_gold, v => new BigNumber(v)),
                         perUnit_mana: mapObject(content.hero.necklaces?.perUnit_mana, v => new BigNumber(v)),
-                    }
+                    },
+                    autoPurchase: content.hero.autoPurchase || {},
                 },
                 battle: {
                     ...content.battle,

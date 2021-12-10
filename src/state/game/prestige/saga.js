@@ -76,7 +76,7 @@ class PrestigeSaga{
 
     static *startRun() {
         const page = yield select(state => state.ui.page);
-        const prestige = yield select(state => state.game.prestige);
+        const {prestige, hero} = yield select(state => state.game);
         // yield put(stateUpdaters.setProphecy.make(page));
         // yield put(stateUpdaters.setIsPrestiging.make(false));
         yield put(LoaderActions.load.make({
@@ -100,7 +100,13 @@ class PrestigeSaga{
                 energy: {
                     value: new BigNumber(0)
                 },
-                training: {},
+                training: {
+
+                },
+                autoPurchase: {
+                    energyLevel: hero.autoPurchase?.energyLevel || false,
+                    energyRegenLevel: hero.autoPurchase?.energyRegenLevel || false,
+                },
                 necklaces: {
                     mana: new BigNumber(0),
                     gold: new BigNumber(0),

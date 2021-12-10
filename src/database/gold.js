@@ -69,7 +69,7 @@ export const goldUnits = [{
                 cost: {
                     energy: new BigNumber(i),
                     gold: new BigNumber(10).pow(i*i),
-                    mana: new BigNumber(10).pow(i*i).mul(i),
+                    mana: new BigNumber(10).pow(i*i).mul(new BigNumber(2).pow(i)),
                     unit: {
                         [`sumonner${i-1}`]: new BigNumber(10).pow(i*i).mul(i+1)
                     }

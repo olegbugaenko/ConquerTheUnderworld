@@ -10,7 +10,7 @@ import classNames from "classnames";
 
 function Energy() {
     const dispatch = useDispatch();
-    const { hero } = useSelector(state => state.game);
+    const { hero, prestige } = useSelector(state => state.game);
     const { trainingCalculations, necklacesCalculations } = useSelector(state => state.ui);
     return(<div className={'energy-screen'}>
         <div className={'skills-data'}>
@@ -20,9 +20,23 @@ function Energy() {
             {skills.map(one => (
                 <div className={classNames('skill-data','column')}>
                     <div className={'skillName'}>
-                        <p>{one.name} ({formatBig(one.level)})</p>
+                        <p>{one.name} ({formatBig(hero.training[one.id])})</p>
                     </div>
                     <CostComponent cost={trainingCalculations.find(u => u.id === one.id)?.costs} />
+                    {prestige.upgrades.autoTrain && hero.autoPurchase ? (<div className={'auto-purchase'}>
+                        <label>
+                            <input
+                                type={'checkbox'}
+                                checked={hero.autoPurchase[one.id]}
+
+                                onChange={()=>dispatch(stateUpdaters.setAutopurchase.make({
+                                    id: one.id,
+                                    value: !hero.autoPurchase[one.id],
+                                }))}
+                            />
+                            Auto purchase enabled
+                        </label>
+                    </div> ) : <></>}
                     <div>
                         <button
                             onClick={e => dispatch(interactionActions.purchaseSkill.make({

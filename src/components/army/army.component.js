@@ -8,6 +8,7 @@ import CostComponent from "../general/cost.component";
 import formatBig from "../general/fmt-val";
 import {Scrollbars} from "react-custom-scrollbars";
 import classNames from "classnames";
+import {goldUnits} from "../../database/gold";
 
 const ArmyUnit = ({unit, qty}) => {
     const dispatch = useDispatch();
@@ -41,7 +42,11 @@ function Army() {
     return(<div className={classNames('army-screen','units-screen')}>
         <div className={'units'}>
             <Scrollbars style={{ width: 280, height: '100vh' }}>
-            {armyUnits.map(one => <ArmyUnit unit={one} qty={army.units ? army.units[one.id] : null}/>)}
+            {armyUnits
+                .filter((item, index) => index <= 0 || (
+                    army.units[armyUnits[index-1].id] && army.units[armyUnits[index-1].id].gt(0)
+                ))
+                .map(one => <ArmyUnit unit={one} qty={army.units ? army.units[one.id] : null}/>)}
             </Scrollbars>
         </div>
         <div className={'unit-details'}>
@@ -76,18 +81,21 @@ function Army() {
                             </div>
                             <div className={'purchaseArea'}>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: new BigNumber(1)
                                     }))}
                                 >Buy 1</button></div>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: armyCalculations.per10Percent?.qty
                                     }))}
                                 >Buy {formatBig(armyCalculations.per10Percent?.qty)}</button></div>
                                 <div><button
+                                    className={'big'}
                                     onClick={e => dispatch(interactionActions.purchase.make({
                                         id: currentUnit.id,
                                         amount: armyCalculations.perMax?.qty

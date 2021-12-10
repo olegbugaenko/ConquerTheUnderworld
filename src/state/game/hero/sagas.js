@@ -16,7 +16,7 @@ class HeroSaga {
 
     static *updatePurchaseConstrains(currentLevels) {
         const allSkillsData = skills;
-        const state = yield select(state => state.game)
+        const state = yield select(state => state.game);
         return yield all(
             allSkillsData.filter(u => u.id in currentLevels).map(function* (one) {
 
@@ -44,11 +44,17 @@ class HeroSaga {
             .mul(new BigNumber(2).pow(currentData.training.energyRegenLevel || new BigNumber(0)));
 
         yield put(HeroStateActions.regenEnergy.make(eRegen.mul(DELAY / 1000)));
-        const calculations = yield call(HeroSaga.updatePurchaseConstrains, currentData.training);
+        const o = {};
+        skills.forEach(s => {
+            o[s.id] = new BigNumber(0)
+        });
+        const calculations = yield call(HeroSaga.updatePurchaseConstrains, {...o, ...currentData.training});
         if(prestige.upgrades.autoTrain && prestige.upgrades.autoTrain.gt(0)) {
             for(const cost of calculations) {
-                if(cost.isAvailable && currentData.training.autoPurchase[cost.id]) {
-                    yield put(interactionActions.purchaseSkill.make(cost.id));
+                // console.log('cost', cost);
+                if(cost.isAvailable && currentData.autoPurchase[cost.id]) {
+                    yield put(interactionActions.purchaseSkill.make({id: cost.id}));
+                    break;
                 }
             }
         }

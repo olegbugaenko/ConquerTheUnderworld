@@ -32,24 +32,35 @@ function Battle() {
             </div>
         </div>
         <div className={'settings'}>
-            <span>Level: {formatBig(battle.level)} of {formatBig(battle.maxLevel)}</span>
-            <span> Fame: {formatBig(battle.fame)}</span>
-            <div>
-                <button onClick={e => dispatch(stateUpdaters.setBattleInProgress.make(!battle.isBattleInProgress))}>
-                    {battle.isBattleInProgress ? 'Stop' : 'Start'}
-                </button>
-                <input
-                    type="checkbox"
-                    checked={battle.isAutoAdvance}
-                    onClick={(e) => dispatch(stateUpdaters.setAutoAdvance.make(!battle.isAutoAdvance))}
-                />
-            </div>
-            <div className={'prestige-area'}>
-                {battle.fame && battle.fame.gte(10) && (
-                    <button onClick={e => dispatch(interactionActions.doPrestige.make())}>
-                        Prestige
-                    </button>
-                )}
+            <div className={'columns'}>
+                <div className={'column'}>
+                    <p>
+                        <span>Level: {formatBig(battle.level)} of {formatBig(battle.maxLevel)}</span>
+                    </p>
+                    <div>
+                        <button onClick={e => dispatch(stateUpdaters.setBattleInProgress.make(!battle.isBattleInProgress))}>
+                            {battle.isBattleInProgress ? 'Stop' : 'Start'}
+                        </button>
+                        <label
+                            onClick={(e) => dispatch(stateUpdaters.setAutoAdvance.make(!battle.isAutoAdvance))}
+                        >
+                            <input
+                                type="checkbox"
+                                checked={battle.isAutoAdvance}
+                            />
+                            Auto-advance
+                        </label>
+
+                    </div>
+                </div>
+                <div className={'column'}>
+                    <p>Fame: {formatBig(battle.fame)}</p>
+                    {battle.fame && battle.fame.gte(10) && (
+                        <button onClick={e => dispatch(interactionActions.doPrestige.make())}>
+                            Prestige
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     </div> )
