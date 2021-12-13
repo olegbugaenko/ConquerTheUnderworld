@@ -21,7 +21,7 @@ import {goldUnits} from "../../../database/gold";
 
 class ArmySaga {
 
-    static *updateUpgradeConstrains(targetId, currentLevels = {}, upgradeId) {
+    static *updateUpgradeConstrains(targetId, currentLevels = {}, upgradeId, qty) {
         const state = yield select(state => state.game);
         const flt = upgradeId
             ? u => upgradeId ? u.id === upgradeId : true
@@ -37,6 +37,7 @@ class ArmySaga {
             return yield call(CalculateSaga.updateSkillOrUpgradeConstrains, {
                 ...one,
                 level: currentLevels[one.id] || new BigNumber(0),
+                qty
             }, state);
         }));
 
@@ -54,6 +55,8 @@ class ArmySaga {
         const { armyUnit, page } = yield select(state => state.ui);
         const units = [];
         const ECP = {};
+        const rage = yield call(CalculateSaga.getGlobalRageBonus,{ prestige, battle });
+
         for(let i = armyUnits.length - 1; i>-1; i--) {
             const unitAmount = currentData.units[armyUnits[i].id];
             if(!unitAmount) continue;
@@ -69,9 +72,7 @@ class ArmySaga {
             let pB = new BigNumber(1);
 
             pB = pB.mul(
-                new BigNumber(1).add((prestige.upgrades.rage1 || new BigNumber(0))
-                    .mul((battle.maxLevel || new BigNumber(0)))
-                    .mul(new BigNumber(0.01)))
+                rage
             );
 
             // console.log(goldUnits[i].id, bonus.toFixed(2));
@@ -171,13 +172,14 @@ class ArmySaga {
             null,
             currentData.upgrades,
             payload.id,
+            new BigNumber(payload.amount)
         );
         // console.log('purchased', calculations);
         if(calculations.length && calculations[0].isAvailable) {
             yield call(CalculateSaga.subtractResources, calculations[0].costs);
             yield put(ArmyStateActions.updateUnitUpgrade.make({
                 id: payload.id,
-                amount: 1,
+                amount: calculations[0].qty,
             }))
         }
     }

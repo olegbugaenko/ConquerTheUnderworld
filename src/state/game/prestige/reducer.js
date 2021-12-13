@@ -24,7 +24,7 @@ export default makeReducer(
         ...state,
         prestige: {
             ...state.prestige,
-            [payload.id || state.prophecy]: (state.prestige[state.prophecy] || new BigNumber(0)).add(payload.amount)
+            [payload.id || state.prophecy]: (state.prestige[payload.id || state.prophecy] || new BigNumber(0)).add(payload.amount)
         }
     }}),
     on(stateUpdaters.setIsPrestiging, (state, { payload }) => {

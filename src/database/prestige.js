@@ -168,4 +168,24 @@ export const prestiges = [{
             warrior: new BigNumber(1.5).pow(lvl).mul(50).roundTo(0),
         }
     })
+},{
+    name: 'Fame',
+    id: 'fame1',
+    prophecyId: 'warrior',
+    description: 'Each level increase fame gain by 10% per level (multiplicative)',
+    cost: (lvl) => ({
+        prestige: {
+            warrior: new BigNumber(2).pow(lvl).mul(2000).roundTo(0),
+        }
+    })
+},{
+    name: 'Speed',
+    id: 'speed1',
+    prophecyId: 'warrior',
+    description: 'Each level increase speed of battle by 5% per level (multiplicative)',
+    cost: (lvl) => ({
+        prestige: {
+            warrior: new BigNumber(3).pow(lvl).mul(2000).roundTo(0),
+        }
+    })
 }])

@@ -31,13 +31,17 @@ const formatBig = (amount, isInt) => {
         console.error(e);
     }
     if(amount.lt(1.e-4)) {
-        if(amount.lt('1.e-20') || !amount.bn.c) return '0';
+        if(amount.lt('1.e-200') || !amount.bn.c) return '0';
         console.log('amount.bn.c', amount.bn.c);
         const strM = coeffToString(amount.bn.c);
         const rsM = (strM.length > 1 ? strM.charAt(0) + '.' + strM.slice(1).substring(0,3) : strM.substr(3)) +
             (amount.bn.e < 0 ? 'e' : 'e+') + amount.bn.e;
         return amount.bn.s < 0 ? '-' + rsM : rsM;
     }
+    if(amount.lt(1) && amount.gte('1.e-4')) {
+        return amount.roundTo(5).valueOf();
+    }
+    amount = amount.roundTo(4);
     if (amount.lt(1.e45)) {
         if(amount.lt(1.e3)) return amount.valueOf();
         if(amount.lt(1.e6)) return `${amount.div(1000).toFixed(2)}K`;
@@ -70,6 +74,38 @@ const formatBig = (amount, isInt) => {
         if(amount.lt(1.e84)) return `${amount.div(1.e81).toFixed(2)}SxVi`;
         if(amount.lt(1.e87)) return `${amount.div(1.e84).toFixed(2)}SpVi`;
         if(amount.lt(1.e90)) return `${amount.div(1.e87).toFixed(2)}OcVi`;
+    } else if (amount.lt(1.e135)) {
+        if(amount.lt(1.e93)) return `${amount.div(1.e90).toFixed(2)}NVi`;
+        if(amount.lt(1.e96)) return `${amount.div(1.e93).toFixed(2)}Td`;
+        if(amount.lt(1.e99)) return `${amount.div(1.e96).toFixed(2)}UTd`;
+        if(amount.lt(1.e102)) return `${amount.div(1.e99).toFixed(2)}DTd`;
+        if(amount.lt(1.e105)) return `${amount.div(1.e102).toFixed(2)}TTd`;
+        if(amount.lt(1.e108)) return `${amount.div(1.e105).toFixed(2)}QaTd`;
+        if(amount.lt(1.e111)) return `${amount.div(1.e108).toFixed(2)}QiTd`;
+        if(amount.lt(1.e114)) return `${amount.div(1.e111).toFixed(2)}SxTd`;
+        if(amount.lt(1.e117)) return `${amount.div(1.e114).toFixed(2)}SpTd`;
+        if(amount.lt(1.e120)) return `${amount.div(1.e117).toFixed(2)}OcTd`;
+        if(amount.lt(1.e123)) return `${amount.div(1.e120).toFixed(2)}NTd`;
+        if(amount.lt(1.e126)) return `${amount.div(1.e123).toFixed(2)}Qd`;
+        if(amount.lt(1.e129)) return `${amount.div(1.e126).toFixed(2)}UQd`;
+        if(amount.lt(1.e132)) return `${amount.div(1.e129).toFixed(2)}DQd`;
+        if(amount.lt(1.e135)) return `${amount.div(1.e132).toFixed(2)}TQd`;
+    } else if (amount.lt(1.e180)) {
+        if(amount.lt(1.e138)) return `${amount.div(1.e135).toFixed(2)}QaQd`;
+        if(amount.lt(1.e141)) return `${amount.div(1.e138).toFixed(2)}QiQd`;
+        if(amount.lt(1.e144)) return `${amount.div(1.e141).toFixed(2)}SxQd`;
+        if(amount.lt(1.e147)) return `${amount.div(1.e144).toFixed(2)}SpQd`;
+        if(amount.lt(1.e150)) return `${amount.div(1.e147).toFixed(2)}OcQd`;
+        if(amount.lt(1.e153)) return `${amount.div(1.e150).toFixed(2)}NQd`;
+        if(amount.lt(1.e156)) return `${amount.div(1.e153).toFixed(2)}Qq`;
+        if(amount.lt(1.e159)) return `${amount.div(1.e156).toFixed(2)}UQq`;
+        if(amount.lt(1.e162)) return `${amount.div(1.e159).toFixed(2)}DQq`;
+        if(amount.lt(1.e165)) return `${amount.div(1.e162).toFixed(2)}TQq`;
+        if(amount.lt(1.e168)) return `${amount.div(1.e165).toFixed(2)}QaQq`;
+        if(amount.lt(1.e171)) return `${amount.div(1.e168).toFixed(2)}QiQq`;
+        if(amount.lt(1.e174)) return `${amount.div(1.e171).toFixed(2)}SxQq`;
+        if(amount.lt(1.e177)) return `${amount.div(1.e174).toFixed(2)}SpQq`;
+        if(amount.lt(1.e180)) return `${amount.div(1.e177).toFixed(2)}OcQq`;
     }
 
     if(!amount.bn.c) {

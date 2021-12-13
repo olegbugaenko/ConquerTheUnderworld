@@ -90,7 +90,7 @@ export const goldUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            skeleton: new BigNumber(25).pow(level.add(1)).roundTo(0),
+            skeleton: new BigNumber(25*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -100,7 +100,7 @@ export const goldUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            sumonner0: new BigNumber(30).pow(level.add(1)).roundTo(0),
+            sumonner0: new BigNumber(30*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -110,7 +110,7 @@ export const goldUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            sumonner1: new BigNumber(35).pow(level.add(1)).roundTo(0),
+            sumonner1: new BigNumber(35*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -124,7 +124,7 @@ export const goldUnitsUpgrades = [{
                 name: 'Effiency',
                 cost: (level) => ({
                     unit: {
-                        [`sumonner${i}`]: new BigNumber(35 + 5*i).pow(level.add(1)).roundTo(0),
+                        [`sumonner${i}`]: new BigNumber((35 + 5*i)*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
                     }
                 }),
                 effect: (level) => new BigNumber(2).pow(level),

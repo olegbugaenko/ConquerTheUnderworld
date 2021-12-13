@@ -27,7 +27,7 @@ class GameSagas {
     }
 
     static *runProcess() {
-        const DELAY = 200;
+        const DELAY = 100;
         while(true) {
             yield delay(DELAY);
             yield call(GameSagas.ticker, { DELAY });

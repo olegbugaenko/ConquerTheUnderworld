@@ -81,18 +81,18 @@ export const manaUnits = [{
     for(let i = 5; i < 50; i++) {
         result.push({
             id: `mage${i}`,
-            name: `Skeleton mage summoner ${i}`,
+            name: `Skeleton mage summoner ${i-1}`,
             cost: {
                 energy: new BigNumber(10).pow(i*(i-3)-1),
                 gold: new BigNumber(10).pow(i*i),
                 mana: new BigNumber(10).pow(i*(i-2)).mul(i),
                 unit: {
-                    [`sumonner${i-1}`]: new BigNumber(10).pow(i*(i-2)-4).mul(i+1)
+                    [`mage${i-1}`]: new BigNumber(10).pow(i*(i-2)-4).mul(i+1)
                 }
             },
             production: {
                 unit: {
-                    [`sumonner${i-1}`]: new BigNumber(i+1)
+                    [`mage${i-1}`]: new BigNumber(i+1)
                 }
             }
         })
@@ -107,7 +107,7 @@ export const manaUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            mage0: new BigNumber(36).pow(level.add(1)).roundTo(0),
+            mage0: new BigNumber(36*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -117,7 +117,7 @@ export const manaUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            mage1: new BigNumber(49).pow(level.add(1)).roundTo(0),
+            mage1: new BigNumber(49*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -127,7 +127,7 @@ export const manaUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            mage2: new BigNumber(64).pow(level.add(1)).roundTo(0),
+            mage2: new BigNumber(64*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -137,7 +137,7 @@ export const manaUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            mage3: new BigNumber(81).pow(level.add(1)).roundTo(0),
+            mage3: new BigNumber(81*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -147,7 +147,7 @@ export const manaUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            mage4: new BigNumber(101).pow(level.add(1)).roundTo(0),
+            mage4: new BigNumber(101*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -157,7 +157,7 @@ export const manaUnitsUpgrades = [{
     name: 'Effiency',
     cost: (level) => ({
         unit: {
-            mage4: new BigNumber(145).pow(level.add(1)).roundTo(0),
+            mage5: new BigNumber(145*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(2).pow(level),
@@ -171,7 +171,7 @@ export const manaUnitsUpgrades = [{
                 name: 'Effiency',
                 cost: (level) => ({
                     unit: {
-                        [`mage${i}`]: new BigNumber(35 + 4*i*i).pow(level.add(1)).roundTo(0),
+                        [`mage${i}`]: new BigNumber((35 + 4*i*i)*Math.pow(1.007, level)).pow(level.add(1)).roundTo(0),
                     }
                 }),
                 effect: (level) => new BigNumber(2).pow(level),

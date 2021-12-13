@@ -15,6 +15,15 @@ import {prestiges} from "../../database/prestige";
 
 class CalculateSaga{
 
+    static *getGlobalRageBonus({ prestige, battle }) {
+        if(!prestige || !battle) {
+            ({ prestige, battle } = yield select(state => state.game));
+        }
+        return new BigNumber(1).add((prestige.upgrades.rage1 || new BigNumber(0))
+            .mul((battle.maxLevel || new BigNumber(0)))
+            .mul(new BigNumber(0.01)))
+    }
+
     static getEffiencyBonus(unit, upgrades, list) {
         let bonus = new BigNumber(1.0);
         list.filter(
@@ -30,74 +39,147 @@ class CalculateSaga{
         return bonus;
     }
 
+    static addCost(cost, cost2, mult = new BigNumber(1)) {
+        if(!cost) cost = {};
+        if(!cost2) cost2 = {};
+        const rs = {};
+        const keys = [...Object.keys(cost),...Object.keys(cost2)];
+        for(const key of keys) {
+            if(key === 'unit' || key === 'prestige') {
+                for(const keyUnit in {...(cost[key] || {}), ...(cost2[key] || {})}) {
+                    if(!rs[key]) {
+                        rs[key] = {};
+                    }
+                    rs[key][keyUnit] = (
+                        (cost[key] && cost[key][keyUnit]) || new BigNumber(0)
+                    ).add(
+                        ((cost2[key] && cost2[key][keyUnit]) || new BigNumber(0)).mul(mult)
+                    )
+                    /*if(keyUnit === 'skeleton') {
+                        console.log('[skeleton]', cost[key][keyUnit].valueOf(), cost2);
+                    }*/
+                }
+            } else {
+                rs[key] = (
+                    cost[key] || new BigNumber(0)
+                ).add(
+                    (cost2[key] || new BigNumber(0)).mul(mult)
+                )
+            }
+        }
+        return rs;
+    }
+
     static *updateSkillOrUpgradeConstrains(skill, state) {
         const { gold, mana, territory, hero, secondary, prestige, army } = state;
-        let maxAmount = new BigNumber('1.e+999999');
-        const costs = {};
-        const levelCosts = skill.cost(skill.level);
-        skill.discount = skill.discount || new BigNumber(1.0);
-        for(const key in levelCosts) {
-            if(key === 'prestige') {
-                for(const prestigeId in levelCosts.prestige) {
-                    costs['prestige'] = {
-                        ...costs['prestige'],
-                        [prestigeId]: levelCosts.prestige[prestigeId].mul(skill.discount),
-                    }
-                    let actualAmount = prestige.prestige[prestigeId] || new BigNumber(0);
-                    maxAmount = BigNumber.min(
-                        maxAmount,
-                        actualAmount.div(levelCosts.prestige[prestigeId].mul(skill.discount))
-                    );
-                }
-            } else
-            if(key !== 'unit') {
-                costs[key] = levelCosts[key].mul(skill.discount);
-                let actualAmount = 0;
-                if(key === 'gold') {
-                    actualAmount = gold?.gold;
-                } else
-                if(key === 'mana') {
-                    actualAmount = mana?.mana;
-                } else
-                if(key === 'territory') {
-                    actualAmount = territory?.territory;
-                } else
-                if(key === 'energy') {
-                    actualAmount = hero?.energy?.value;
-                } else
-                 {
-                    actualAmount = secondary ? secondary[key] : new BigNumber(0)
-                }
-                maxAmount = BigNumber.min(
-                    maxAmount,
-                    actualAmount.div(costs[key])
-                )
-            } else {
-                for(const costUnitId in levelCosts.unit) {
-                    costs['unit'] = {
-                        ...costs['unit'],
-                        [costUnitId]: levelCosts.unit[costUnitId].mul(skill.discount),
-                    }
-                    let units = gold?.units[costUnitId]
-                        || mana?.units[costUnitId]
-                        || army?.units[costUnitId]
-                        || territory?.units[costUnitId];
 
-                    if(!units) {
-                        maxAmount = new BigNumber(0);
-                    } else {
+        const costs = {};
+        skill.discount = skill.discount || new BigNumber(1.0);
+        // let levelCosts = skill.cost(skill.level);
+        if(!skill.qty) skill.qty = new BigNumber(1);
+        let oldLevelCosts = null;
+        let levelCosts = null;
+        let maxAmount = new BigNumber('1.e+999999');
+        let il = skill.level;
+        // for(let il = skill.level; il.lt(skill.level.add(skill.qty)); il.add(1))
+        /*if((skill.id === 'energyLevel' || skill.id === 'energyRegenLevel')) {
+            console.log('ENTER: '+il.valueOf()+' of '+skill.level.add(skill.qty).valueOf(), il.lt(skill.level.add(skill.qty)));
+        }*/
+        while(il.lt(skill.level.add(skill.qty))){
+            maxAmount = new BigNumber('1.e+999999');
+            oldLevelCosts = levelCosts ? CalculateSaga.addCost({}, {...levelCosts}) : null;
+            levelCosts = CalculateSaga.addCost(levelCosts, skill.cost(il), skill.discount);
+            /*if(skill.id === 'energyLevel' || skill.id === 'energyRegenLevel') {
+                console.log('levelCost '+il.valueOf()+' of '+skill.qty.valueOf(), levelCosts);
+                console.log('-=-=-: ', oldLevelCosts, skill.cost(il));
+
+
+            }*/
+            for(const key in levelCosts) {
+                if(key === 'prestige') {
+                    for(const prestigeId in levelCosts.prestige) {
+                        costs['prestige'] = {
+                            ...costs['prestige'],
+                            [prestigeId]: levelCosts.prestige[prestigeId],
+                        }
+                        let actualAmount = prestige.prestige[prestigeId] || new BigNumber(0);
                         maxAmount = BigNumber.min(
                             maxAmount,
-                            units.div(levelCosts.unit[costUnitId])
-                        )
+                            actualAmount.div(levelCosts.prestige[prestigeId])
+                        );
+                    }
+                } else
+                if(key !== 'unit') {
+                    costs[key] = levelCosts[key];
+                    let actualAmount = 0;
+                    if(key === 'gold') {
+                        actualAmount = gold?.gold;
+                    } else
+                    if(key === 'mana') {
+                        actualAmount = mana?.mana;
+                    } else
+                    if(key === 'territory') {
+                        actualAmount = territory?.territory;
+                    } else
+                    if(key === 'energy') {
+                        actualAmount = hero?.energy?.value;
+                    } else
+                    {
+                        actualAmount = secondary ? secondary[key] : new BigNumber(0)
+                    }
+                    maxAmount = BigNumber.min(
+                        maxAmount,
+                        actualAmount.div(costs[key])
+                    )
+                } else {
+                    for(const costUnitId in levelCosts.unit) {
+                        costs['unit'] = {
+                            ...costs['unit'],
+                            [costUnitId]: levelCosts.unit[costUnitId],
+                        }
+                        let units = gold?.units[costUnitId]
+                            || mana?.units[costUnitId]
+                            || army?.units[costUnitId]
+                            || territory?.units[costUnitId];
+
+                        if(!units) {
+                            maxAmount = new BigNumber(0);
+                        } else {
+                            maxAmount = BigNumber.min(
+                                maxAmount,
+                                units.div(levelCosts.unit[costUnitId])
+                            )
+                        }
                     }
                 }
             }
+
+            if(maxAmount.lt(1)) {
+                skill.qty = new BigNumber(il).sub(skill.level);
+                levelCosts = oldLevelCosts || levelCosts;
+                /*if(skill.id === 'energyLevel' || skill.id === 'energyRegenLevel') {
+                    console.log('nEnought: '+il.valueOf(), skill.qty.valueOf());
+                }*/
+                break;
+            }
+            il = il.add(1);
+            /*if(skill.id === 'energyLevel' || skill.id === 'energyRegenLevel') {
+                console.log('enought: '+il.valueOf(), il.lt(skill.level.add(skill.qty)), maxAmount.valueOf(),
+                    gold?.gold?.valueOf(),
+                    levelCosts?.gold?.valueOf()
+                    );
+            }*/
         }
+
+        /*if(skill.id === 'energyLevel' || skill.id === 'energyRegenLevel') {
+            console.log('skill.qty', skill.qty, skill.qty.gt);
+        }*/
+
         return {
-            isAvailable: maxAmount.gte(1),
+            isAvailable: il.gt(skill.level),
             id: skill.id,
             costs: levelCosts,
+            qty: skill.qty,
         }
     }
 

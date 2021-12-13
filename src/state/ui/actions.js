@@ -13,4 +13,6 @@ export const stateUpdaters = {
     setPrestigeCalculated: createAction('SET_PRESTIGE_CALCULATED', payload => payload),
 
     setUnitUpgradesAvailable: createAction('SET_UNIT_UPGRADES_AVAILABLE', payload => payload),
+
+    setUIProp: createAction('SET_UI_PROP', ({ id, value }) => ({ id, value })),
 }

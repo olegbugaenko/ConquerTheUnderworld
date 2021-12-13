@@ -8,6 +8,7 @@ import {interactionActions} from "../../state/game/prestige/actions";
 
 function Battle() {
     const { battle, army } = useSelector(state => state.game);
+    const { props } = useSelector(state => state.ui);
     const dispatch = useDispatch();
     return (<div className={'battle'}>
         <div className={classNames('enemies','columns')}>
@@ -36,6 +37,8 @@ function Battle() {
                 <div className={'column'}>
                     <p>
                         <span>Level: {formatBig(battle.level)} of {formatBig(battle.maxLevel)}</span>
+                        &nbsp;&nbsp;&nbsp;
+                        <span>Rage bonus: x{formatBig(props?.rage ? props.rage.roundTo(2) : 1)}</span>
                     </p>
                     <div>
                         <button onClick={e => dispatch(stateUpdaters.setBattleInProgress.make(!battle.isBattleInProgress))}>

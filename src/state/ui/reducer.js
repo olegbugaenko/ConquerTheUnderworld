@@ -6,7 +6,8 @@ const initialState = {
     page: 'gold',
     goldUnit: 'skeleton',
     manaUnit: 'myth',
-    armyUnit: 'warrior0'
+    armyUnit: 'warrior0',
+    props: {},
 }
 
 export default makeReducer(
@@ -54,5 +55,12 @@ export default makeReducer(
     on(stateUpdaters.setPrestigeCalculated, (state, { payload }) => { return {
         ...state,
         prestigeCalculations: payload,
-    }})
+    }}),
+    on(stateUpdaters.setUIProp, (state, { payload }) => ({
+        ...state,
+        props: {
+            ...state.props,
+            [payload.id]: payload.value,
+        }
+    }))
     )

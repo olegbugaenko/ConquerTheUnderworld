@@ -73,7 +73,7 @@ function Gold() {
                             <CostComponent cost={u.cost.costs}></CostComponent>
                             {u.cost.isAvailable && (<button onClick={e=>dispatch(interactionActions.purchaseUpgrade.make({
                                 id: u.id,
-                                amount: 1,
+                                amount: e.ctrlKey ? 999999 : 1,
                             }))}>Purchase</button>)}
                         </div> ))}
                     </div>

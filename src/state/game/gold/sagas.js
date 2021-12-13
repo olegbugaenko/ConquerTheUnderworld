@@ -22,7 +22,7 @@ import {prestiges} from "../../../database/prestige";
 
 class GoldSaga {
 
-    static *updateUpgradeConstrains(targetId, currentLevels = {}, upgradeId) {
+    static *updateUpgradeConstrains(targetId, currentLevels = {}, upgradeId, qty) {
         const state = yield select(state => state.game);
         const flt = upgradeId
             ? u => upgradeId ? u.id === upgradeId : true
@@ -34,6 +34,7 @@ class GoldSaga {
             return yield call(CalculateSaga.updateSkillOrUpgradeConstrains, {
                 ...one,
                 level: currentLevels[one.id] || new BigNumber(0),
+                qty,
             }, state);
         }));
 
@@ -68,6 +69,8 @@ class GoldSaga {
         const ECP = {};
         const units = [];
 
+        const rage = yield call(CalculateSaga.getGlobalRageBonus,{ prestige, battle });
+
         for(let i = goldUnits.length - 1; i>-1; i--) {
             const unitAmount = currentData.units[goldUnits[i].id];
             if(!unitAmount) continue;
@@ -86,9 +89,7 @@ class GoldSaga {
             pB = pB.mul((hero.necklaces.perUnit_gold[goldUnits[i].id] || new BigNumber(0)).mul(0.5).add(1));
 
             pB = pB.mul(
-                new BigNumber(1).add((prestige.upgrades.rage1 || new BigNumber(0))
-                    .mul((battle.maxLevel || new BigNumber(0)))
-                    .mul(new BigNumber(0.01)))
+                rage
             )
             // console.log(goldUnits[i].id, bonus.toFixed(2));
 
@@ -162,13 +163,14 @@ class GoldSaga {
             null,
             currentData.upgrades,
             payload.id,
+            new BigNumber(payload.amount)
         );
         // console.log('purchased', calculations);
         if(calculations.length && calculations[0].isAvailable) {
             yield call(CalculateSaga.subtractResources, calculations[0].costs);
             yield put(GoldStateActions.updateUnitUpgrade.make({
                 id: payload.id,
-                amount: 1,
+                amount: calculations[0].qty,
             }))
         }
     }

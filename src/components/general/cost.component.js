@@ -84,7 +84,7 @@ const CostComponent = ({ cost }) => {
     return (<div className={'costs'}>
         {
             costArray.map(({ title, amount }) => (<p>
-                {formatBig(amount ? amount.roundTo(5) : amount)}
+                {formatBig(amount)}
                 {' '}
                 {title}
             </p>))

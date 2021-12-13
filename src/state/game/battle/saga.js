@@ -8,13 +8,13 @@ import {
 
 import { BigNumber } from "@waves/bignumber"
 
-import { armyUnits, armyUnitsUpgrades } from "../../../database/army";
-
 import {
     interactionActions,
     stateUpdaters as BattleStateActions
 } from "./actions";
 import {stateUpdaters} from "../army/actions";
+import {stateUpdaters as UIStateUpdaters} from "../../ui/actions";
+import CalculateSaga from "../calculate-saga";
 
 
 class BattleSaga {
@@ -86,7 +86,15 @@ class BattleSaga {
     }
 
     static *handleBattle() {
-        const data = yield select(state => state.game.battle);
+        const {battle: data, prestige} = yield select(state => state.game);
+        const rage = yield call(CalculateSaga.getGlobalRageBonus,{
+            battle: data,
+            prestige,
+        });
+        yield put(UIStateUpdaters.setUIProp.make({
+            id: 'rage',
+            value: rage,
+        }))
         let enemy = data.enemy;
         if(!enemy || !enemy.total) {
             enemy = BattleSaga.generateEnemyForRound(data.level || new BigNumber(0));
@@ -98,7 +106,9 @@ class BattleSaga {
         if(!data.battleStatus.timeToNextRound) {
             yield put(BattleStateActions.setTimeToNextRound.make({
                 round: new BigNumber(0),
-                timeToNextRound: (new Date()).setTime((new Date()).getTime() + 1000),
+                timeToNextRound: (new Date()).setTime((new Date()).getTime() + 1000*(
+                    new BigNumber(0.95).pow(prestige.upgrades.speed1  || new BigNumber(0))).toNumber()
+                ),
             }))
         }
         if(data.battleStatus.timeToNextRound < new Date()) {
@@ -117,7 +127,10 @@ class BattleSaga {
                     ));
                 }
                 yield put(BattleStateActions.setEnemy.make(null));
-                yield put(BattleStateActions.setFameAmount.make(maxLvl.pow(2).mul(0.1)));
+                yield put(BattleStateActions.setFameAmount.make(maxLvl.pow(2).mul(0.1).mul(
+                    new BigNumber(1.10).pow(prestige.upgrades.fame1 || new BigNumber(0))
+                )));
+
             } else if(roundData.status === 'defeat') {
                 round = new BigNumber(0)
                 enemy = BattleSaga.generateEnemyForRound(data.level || new BigNumber(0));

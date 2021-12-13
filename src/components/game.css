@@ -80,6 +80,10 @@
     flex: 1;
 }
 
+.unit-details .main-column {
+    width: 300px;
+}
+
 .columns {
     display: flex;
     justify-content: space-around;
@@ -112,7 +116,7 @@ button:hover{
 
 button.big {
     padding: 3px 10px;
-    width: 130px;
+    width: 160px;
 }
 
 .sidebar {

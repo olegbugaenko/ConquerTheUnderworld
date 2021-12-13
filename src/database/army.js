@@ -69,8 +69,8 @@ export const armyUnits = [{
     name: 'Skeleton captain',
     cost: {
         energy: new BigNumber(25000),
-        gold: new BigNumber(9.e+45),
-        mana: new BigNumber(7.e+39),
+        gold: new BigNumber(9.e+48),
+        mana: new BigNumber(7.e+52),
         unit: {
             warrior3: new BigNumber(9000000)
         }
@@ -78,6 +78,38 @@ export const armyUnits = [{
     production: {
         unit: {
             warrior3: new BigNumber(4)
+        }
+    }
+},{
+    id: 'warrior5',
+    name: 'Skeleton major',
+    cost: {
+        energy: new BigNumber(25000),
+        gold: new BigNumber(4.e+72),
+        mana: new BigNumber(6.e+104),
+        unit: {
+            warrior4: new BigNumber('7.e+11')
+        }
+    },
+    production: {
+        unit: {
+            warrior4: new BigNumber(5)
+        }
+    }
+},{
+    id: 'warrior6',
+    name: 'Skeleton major 2',
+    cost: {
+        energy: new BigNumber(49000),
+        gold: new BigNumber(4.e+132),
+        mana: new BigNumber(6.e+194),
+        unit: {
+            warrior5: new BigNumber('5.e+16')
+        }
+    },
+    production: {
+        unit: {
+            warrior5: new BigNumber(5)
         }
     }
 }]
@@ -88,7 +120,7 @@ export const armyUnitsUpgrades = [{
     name: 'Attack',
     cost: (level) => ({
         unit: {
-            skeleton: new BigNumber(25).pow(level.add(1)).roundTo(0),
+            skeleton: new BigNumber(25*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(1.2).pow(level),
@@ -98,7 +130,7 @@ export const armyUnitsUpgrades = [{
     name: 'Defense',
     cost: (level) => ({
         unit: {
-            skeleton: new BigNumber(25).pow(level.add(1)).roundTo(0),
+            skeleton: new BigNumber(25*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
         }
     }),
     effect: (level) => new BigNumber(1.2).pow(level),
@@ -112,7 +144,7 @@ export const armyUnitsUpgrades = [{
                 name: 'Effiency',
                 cost: (level) => ({
                     unit: {
-                        [`warrior${i}`]: new BigNumber(25 + 5*i).pow(level.add(1)).roundTo(0),
+                        [`warrior${i}`]: new BigNumber((25 + 5*i)*Math.pow(1.01, level)).pow(level.add(1)).roundTo(0),
                     }
                 }),
                 effect: (level) => new BigNumber(2).pow(level),

@@ -20,7 +20,7 @@ import {goldUnits} from "../../../database/gold";
 
 class ManaSaga {
 
-    static *updateUpgradeConstrains(targetId, currentLevels = {}, upgradeId) {
+    static *updateUpgradeConstrains(targetId, currentLevels = {}, upgradeId, qty) {
         const state = yield select(state => state.game);
         const flt = upgradeId
             ? u => upgradeId ? u.id === upgradeId : true
@@ -32,6 +32,7 @@ class ManaSaga {
             return yield call(CalculateSaga.updateSkillOrUpgradeConstrains, {
                 ...one,
                 level: currentLevels[one.id] || new BigNumber(0),
+                qty,
             }, state);
         }));
 
@@ -60,11 +61,12 @@ class ManaSaga {
 
     static *updateMana(DELAY) {
         const currentData = yield select(state => state.game.mana);
-        const prestige = yield select(state => state.game.prestige);
-        const {hero, battle} = yield select(state => state.game);
+        const {hero, battle, prestige} = yield select(state => state.game);
         const { manaUnit, page } = yield select(state => state.ui);
         const units = [];
         const ECP = {};
+        const rage = yield call(CalculateSaga.getGlobalRageBonus,{ prestige, battle });
+
         for(let i = manaUnits.length - 1; i>-1; i--) {
             const unitAmount = currentData.units[manaUnits[i].id];
             if(!unitAmount) continue;
@@ -74,9 +76,9 @@ class ManaSaga {
                 currentData.upgrades,
                 manaUnitsUpgrades
             );
-            let pB = new BigNumber(1).add((prestige.upgrades.rage1 || new BigNumber(0))
-                .mul((battle.maxLevel || new BigNumber(0)))
-                .mul(new BigNumber(0.01)));
+            let pB = new BigNumber(1);
+
+            pB = pB.mul(rage);
 
             pB = pB.mul((hero.necklaces.perUnit_mana[manaUnits[i].id] || new BigNumber(0)).mul(0.5).add(1));
 
@@ -147,13 +149,14 @@ class ManaSaga {
             null,
             currentData.upgrades,
             payload.id,
+            new BigNumber(payload.amount)
         );
         // console.log('purchased', calculations);
         if(calculations.length && calculations[0].isAvailable) {
             yield call(CalculateSaga.subtractResources, calculations[0].costs);
             yield put(ManaStateActions.updateUnitUpgrade.make({
                 id: payload.id,
-                amount: 1,
+                amount: calculations[0].qty,
             }))
         }
     }

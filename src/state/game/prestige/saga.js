@@ -66,7 +66,7 @@ class PrestigeSaga{
             PrestigeSaga.calculatePrestigeCosts,
             {payload},
         );
-        // console.log('purchased', calculations);
+        console.log('purchased', calculations);
         if(calculations.length && calculations[0].isAvailable) {
             yield call(CalculateSaga.subtractResources, calculations[0].costs);
             yield put(stateUpdaters.setUpgrade.make(payload));
